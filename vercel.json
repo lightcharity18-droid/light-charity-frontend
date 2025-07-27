@@ -1,9 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "installCommand": "npm install",
-  "env": {
-    "BACKEND_URL": "@BACKEND_URL"
+  "version": 2,
+  "build": {
+    "env": {
+      "ENABLE_PNPM": "1"
+    }
   }
-} 
+}
