@@ -11,7 +11,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000'
 
 interface BlogPost {
   _id: string

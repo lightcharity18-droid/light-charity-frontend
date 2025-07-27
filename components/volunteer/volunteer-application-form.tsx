@@ -54,7 +54,7 @@ export function VolunteerApplicationForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/volunteer/apply`, {
+      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/volunteer/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

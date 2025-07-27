@@ -59,7 +59,7 @@ export function ChatbotWidget() {
     // Check backend connectivity
     const checkConnection = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/chatbot/health`)
+        const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/chatbot/health`)
         if (response.ok) {
           setIsConnected(true)
           setIsOnline(true)
@@ -141,7 +141,7 @@ How can I assist you today?`,
     try {
       if (isConnected) {
         // Try to use the backend API
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/chatbot/chat`, {
+        const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/chatbot/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -496,7 +496,7 @@ What specific information can I provide for you?`
     try {
       if (isConnected && sessionId) {
         // Try to clear conversation on backend
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/chatbot/conversation/${sessionId}`, {
+        await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/chatbot/conversation/${sessionId}`, {
           method: 'DELETE',
         })
       }

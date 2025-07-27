@@ -48,7 +48,7 @@ export default function MessagesPage() {
         return
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/messages/send`, {
+      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/messages/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
