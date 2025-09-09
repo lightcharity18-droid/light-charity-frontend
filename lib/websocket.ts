@@ -149,13 +149,13 @@ class WebSocketService {
   }
 
   private getServerUrl(): string {
-    // Use BACKEND_URL for production, fallback to localhost for development
+    // Use NEXT_PUBLIC_BACKEND_URL for production, fallback to localhost for development
     if (process.env.NODE_ENV === 'production') {
-      const backendUrl = process.env.BACKEND_URL;
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
       if (backendUrl) {
         return backendUrl;
       }
-      // Fallback for production if BACKEND_URL is not set
+      // Fallback for production if NEXT_PUBLIC_BACKEND_URL is not set
       const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
       return `${protocol}//${window.location.host}`;
     }

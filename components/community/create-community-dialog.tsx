@@ -92,7 +92,7 @@ export function CreateCommunityDialog({ open, onOpenChange, onSuccess }: CreateC
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

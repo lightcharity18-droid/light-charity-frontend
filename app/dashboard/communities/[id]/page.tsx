@@ -282,7 +282,7 @@ export default function CommunityPage() {
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -330,7 +330,7 @@ export default function CommunityPage() {
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -378,7 +378,7 @@ export default function CommunityPage() {
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/join`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/join`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -425,7 +425,7 @@ export default function CommunityPage() {
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

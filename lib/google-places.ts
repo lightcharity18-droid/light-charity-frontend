@@ -84,7 +84,7 @@ export interface DonationCenterFromPlaces {
 
 class GooglePlacesService {
   private apiKey: string
-  private baseUrl = process.env.BACKEND_URL || 'http://localhost:5000'
+  private baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''

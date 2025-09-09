@@ -73,7 +73,7 @@ export default function MessagesPage() {
       const token = authService.getToken();
       if (!token || !authService.isAuthenticated()) return;
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/my-communities`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/my-communities`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -119,7 +119,7 @@ export default function MessagesPage() {
       const token = authService.getToken();
       if (!token || !authService.isAuthenticated()) return;
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -156,7 +156,7 @@ export default function MessagesPage() {
         return;
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${selectedCommunity._id}/messages`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${selectedCommunity._id}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

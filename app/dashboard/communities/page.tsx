@@ -124,7 +124,7 @@ export default function CommunitiesPage() {
         ...(selectedType !== 'all' && { type: selectedType })
       })
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -154,7 +154,7 @@ export default function CommunitiesPage() {
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/my-communities`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/my-communities`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -182,7 +182,7 @@ export default function CommunitiesPage() {
         return
       }
 
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/join`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/join`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

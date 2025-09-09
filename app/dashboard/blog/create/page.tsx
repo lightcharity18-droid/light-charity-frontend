@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Plus, X, AlertCircle, CheckCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
-const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
 interface BlogFormData {
   title: string

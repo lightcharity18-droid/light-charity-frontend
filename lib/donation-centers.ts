@@ -55,7 +55,7 @@ export interface RouteInfo {
   steps?: any[]
 }
 
-const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
 export const donationCentersAPI = {
   // Get all donation centers (from database)
