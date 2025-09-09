@@ -3,6 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+
+// Type definitions for geolocation
+interface GeolocationAddress {
+  city: string
+  fullAddress: string
+  country: string
+  state: string
+}
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/contexts/auth-context"
 import { Loader2, CalendarIcon, MapPin } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -29,51 +38,133 @@ export function DonationForm() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [city, setCity] = useState("")
   const { toast } = useToast()
+  const { user, isAuthenticated } = useAuth()
 
   useEffect(() => {
     // Try to get user's location when component mounts
-    getLocation()
+    getLocation().catch(console.error)
   }, [])
 
-  const getLocation = () => {
-    if (navigator.geolocation) {
-      setIsGettingLocation(true)
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Simulate reverse geocoding
-          setTimeout(() => {
-            setCity("New York, NY")
-            setLocation("Central Blood Bank, 123 Main St, New York, NY")
-            setIsGettingLocation(false)
-
-            toast({
-              title: "Location detected",
-              description: "We've found your location: New York, NY",
-            })
-          }, 1500)
-        },
-        (error) => {
-          console.error("Error getting location:", error)
-          setIsGettingLocation(false)
-
-          toast({
-            title: "Location not available",
-            description: "Please enter your location manually.",
-            variant: "destructive",
-          })
-        },
-      )
-    } else {
+  const getLocation = async () => {
+    if (!navigator.geolocation) {
       toast({
         title: "Geolocation not supported",
-        description: "Your browser doesn't support geolocation.",
+        description: "Your browser doesn't support geolocation. Please enter your location manually.",
         variant: "destructive",
       })
+      return
+    }
+
+    setIsGettingLocation(true)
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000, // 10 seconds timeout
+      maximumAge: 300000 // 5 minutes cache
+    }
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, options)
+      })
+
+      const { latitude, longitude } = position.coords
+      
+      // Use reverse geocoding to get address from coordinates
+      const address = await reverseGeocode(latitude, longitude)
+      
+      if (address) {
+        setCity(address.city || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
+        setLocation(address.fullAddress || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
+        
+        toast({
+          title: "Location detected",
+          description: `We've found your location: ${address.city || 'Unknown location'}`,
+        })
+      } else {
+        // Fallback to coordinates if reverse geocoding fails
+        setCity(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
+        setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
+        
+        toast({
+          title: "Location detected",
+          description: "Location coordinates detected. Please verify the address.",
+        })
+      }
+    } catch (error: any) {
+      console.error("Error getting location:", error)
+      
+      let errorMessage = "Please enter your location manually."
+      
+      if (error.code === 1) {
+        errorMessage = "Location access denied. Please enable location permissions or enter manually."
+      } else if (error.code === 2) {
+        errorMessage = "Location unavailable. Please enter your location manually."
+      } else if (error.code === 3) {
+        errorMessage = "Location request timed out. Please try again or enter manually."
+      }
+
+      toast({
+        title: "Location not available",
+        description: errorMessage,
+        variant: "destructive",
+      })
+    } finally {
+      setIsGettingLocation(false)
+    }
+  }
+
+  // Reverse geocoding function using a free API
+  const reverseGeocode = async (latitude: number, longitude: number): Promise<GeolocationAddress | null> => {
+    try {
+      // Using OpenStreetMap Nominatim API (free, no API key required)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'LightCharity/1.0' // Required by Nominatim
+          }
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Reverse geocoding failed')
+      }
+
+      const data = await response.json()
+      
+      if (data.display_name) {
+        const addressParts = data.display_name.split(', ')
+        const city = addressParts[1] || addressParts[0] || 'Unknown City'
+        
+        return {
+          city,
+          fullAddress: data.display_name,
+          country: data.address?.country || '',
+          state: data.address?.state || ''
+        }
+      }
+      
+      return null
+    } catch (error) {
+      console.error('Reverse geocoding error:', error)
+      return null
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to schedule a donation.",
+        variant: "destructive",
+      })
+      return
+    }
 
     // Form validation
     if (!bloodGroup) {
@@ -115,15 +206,37 @@ export function DonationForm() {
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
+      const token = localStorage.getItem('auth_token')
+
+      const response = await fetch(`${API_BASE_URL}/api/donations/schedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bloodGroup,
+          scheduledDate: date.toISOString(),
+          location,
+          notes,
+          healthConfirmed: healthCondition,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to schedule donation')
+      }
 
       // Show confirmation modal
       setShowConfirmation(true)
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error scheduling donation:', error)
       toast({
         title: "Something went wrong",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
         variant: "destructive",
       })
     } finally {

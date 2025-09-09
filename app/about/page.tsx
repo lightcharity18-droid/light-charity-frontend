@@ -26,43 +26,17 @@ export default function AboutPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                We're on a mission to ensure that everyone who needs blood can receive it. Through our network of donors
-                and centers, we're saving lives every day.
+                Every drop of blood, every tree planted, every life touched—our mission is to save lives and build hope. From connecting donors worldwide to bringing clean water, disaster relief, and greener cities, Light Charity Foundation stands for humanity, health, and a brighter future.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Impact Stats */}
-        <section className="py-16 bg-background">
-          <div className="container">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-              {[
-                { icon: Heart, label: "Blood Donations", value: "0", color: "text-red-500" },
-                { icon: Users, label: "Lives Saved", value: "0", color: "text-blue-500" },
-                { icon: MapPin, label: "Partner Hospitals", value: "0", color: "text-green-500" },
-                { icon: Globe, label: "Donation Centers", value: "0", color: "text-orange-500" },
-              ].map((stat, index) => (
-                <Card
-                  key={index}
-                  className="text-center hover:shadow-lg transition-all duration-300 animate-slide-up"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <CardContent className="p-6">
-                    <stat.icon className={`h-8 w-8 ${stat.color} mx-auto mb-3`} />
-                    <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* What We Do */}
         <section className="py-20 bg-muted/30">
           <div className="container">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="max-w-4xl mx-auto">
               <div className="space-y-8">
                 <div>
                   <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 px-4 py-2 rounded-full mb-4">
@@ -118,31 +92,6 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 rounded-2xl transform rotate-3"></div>
-                <Card className="relative bg-card rounded-2xl shadow-xl">
-                  <CardContent className="p-8">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">0</div>
-                        <div className="text-sm text-muted-foreground">Blood Donations</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">0</div>
-                        <div className="text-sm text-muted-foreground">Lives Saved</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">0</div>
-                        <div className="text-sm text-muted-foreground">Partner Hospitals</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">0</div>
-                        <div className="text-sm text-muted-foreground">Donation Centers</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
             </div>
           </div>
         </section>
@@ -151,10 +100,6 @@ export default function AboutPage() {
         <section className="py-20 bg-background">
           <div className="container">
             <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-full mb-6 shadow-sm">
-                <Shield className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-muted-foreground">Trusted by Canadians</span>
-              </div>
               <h2 className="text-4xl font-bold mb-8 text-foreground">About Us</h2>
               <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
                 <p>
