@@ -59,7 +59,7 @@ export function ChatbotWidget() {
     // Check backend connectivity
     const checkConnection = async () => {
       try {
-        const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/chatbot/health`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/chatbot/health`)
         if (response.ok) {
           setIsConnected(true)
           setIsOnline(true)
@@ -141,7 +141,7 @@ How can I assist you today?`,
     try {
       if (isConnected) {
         // Try to use the backend API
-        const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/chatbot/chat`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/chatbot/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -496,7 +496,7 @@ What specific information can I provide for you?`
     try {
       if (isConnected && sessionId) {
         // Try to clear conversation on backend
-        await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/chatbot/conversation/${sessionId}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/chatbot/conversation/${sessionId}`, {
           method: 'DELETE',
         })
       }
@@ -620,14 +620,19 @@ What specific information can I provide for you?`
 
                       <div
                         className={cn(
-                          "max-w-[80%] rounded-lg shadow-sm relative group",
+                          "max-w-[80%] relative group shadow-sm break-words w-fit",
                           message.sender === "user"
-                            ? "bg-gradient-to-r from-orange-500 to-red-500 text-white p-3"
-                            : "bg-muted",
+                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-3 rounded-t-2xl rounded-bl-2xl rounded-br-md"
+                            : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-2xl rounded-br-2xl rounded-bl-md",
                         )}
                       >
                         {message.sender === "user" ? (
-                          <p className="text-sm leading-relaxed">{message.content}</p>
+                          <>
+                            <p className="text-sm leading-relaxed">{message.content}</p>
+                            <p className="text-xs opacity-70 mt-2">
+                              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </>
                         ) : (
                           <>
                             {/* Copy button for bot responses */}
@@ -643,14 +648,11 @@ What specific information can I provide for you?`
                                 className="text-gray-800 dark:text-gray-200"
                               />
                             </div>
+                            <p className="text-xs opacity-70 px-3 pb-3">
+                              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </p>
                           </>
                         )}
-                        <p className={cn(
-                          "text-xs opacity-70 mt-2",
-                          message.sender === "bot" ? "px-3 pb-3" : ""
-                        )}>
-                          {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </p>
                       </div>
 
                       {message.sender === "user" && (

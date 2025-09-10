@@ -57,7 +57,7 @@ export default function VolunteerDashboard() {
   const fetchApplications = async () => {
     try {
       const statusParam = selectedStatus !== "all" ? `?status=${selectedStatus}` : ""
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/volunteer/applications${statusParam}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/volunteer/applications${statusParam}`)
       const result = await response.json()
       
       if (response.ok) {
@@ -81,7 +81,7 @@ export default function VolunteerDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/volunteer/applications/stats`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/volunteer/applications/stats`)
       const result = await response.json()
       
       if (response.ok) {
@@ -94,7 +94,7 @@ export default function VolunteerDashboard() {
 
   const updateApplicationStatus = async (id: string, status: string) => {
     try {
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/volunteer/applications/${id}/status`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/volunteer/applications/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

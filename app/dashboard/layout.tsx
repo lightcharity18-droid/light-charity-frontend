@@ -2,7 +2,7 @@ import type React from "react"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, Calendar, Home, LogOut, Mail, MapPin, Menu, Settings, Users, Droplet, PenTool } from "lucide-react"
+import { Bell, Calendar, Home, LogOut, Mail, MapPin, Menu, Settings, Users, Droplet, PenTool, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { DonorBadge } from "@/components/badges/donor-badge"
@@ -19,13 +19,13 @@ export default function DashboardLayout({
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col bg-background">
-        <header className="border-b shadow-sm py-4 bg-card">
-          <div className="container flex justify-between items-center">
-            <div className="flex items-center gap-4">
+        <header className="border-b shadow-sm py-2 md:py-4 bg-card w-full">
+          <div className="flex justify-between items-center h-full w-full px-4 md:px-6">
+            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden">
-                    <Menu className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="md:hidden h-8 w-8">
+                    <Menu className="h-4 w-4" />
                     <span className="sr-only">Toggle menu</span>
                   </Button>
                 </SheetTrigger>
@@ -79,6 +79,15 @@ export default function DashboardLayout({
                           >
                             <MapPin className="h-4 w-4" />
                             Locations
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/dashboard/communities"
+                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            Communities
                           </Link>
                         </li>
                         <li>
@@ -166,6 +175,15 @@ export default function DashboardLayout({
                 >
                   <MapPin className="h-4 w-4" />
                   Locations
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/dashboard/communities"
+                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Communities
                 </Link>
               </li>
               <li>

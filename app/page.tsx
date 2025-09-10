@@ -13,7 +13,7 @@ import { CalendarDays, Clock, Droplet, FileText, Heart, Users, Shield, Award, Ma
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 
-const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
 interface BlogPost {
   _id: string

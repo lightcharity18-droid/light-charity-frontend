@@ -42,34 +42,38 @@ export function DashboardHeader() {
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <Button variant="ghost" size="icon" className="relative">
-        <Bell className="h-5 w-5" />
-        <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary" />
-        <span className="sr-only">Notifications</span>
-      </Button>
-      
-      <Button variant="ghost" size="icon">
-        <Mail className="h-5 w-5" />
-        <span className="sr-only">Messages</span>
-      </Button>
+    <div className="flex items-center gap-2 md:gap-4 min-w-0">
+      <div className="flex items-center gap-1 md:gap-2">
+        <Button variant="ghost" size="icon" className="relative h-8 w-8 md:h-9 md:w-9">
+          <Bell className="h-4 w-4 md:h-5 md:w-5" />
+          <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary" />
+          <span className="sr-only">Notifications</span>
+        </Button>
+        
+        <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9">
+          <Mail className="h-4 w-4 md:h-5 md:w-5" />
+          <span className="sr-only">Messages</span>
+        </Button>
 
-      {user?.userType === 'donor' && (
-        <DonorBadge level="gold" count={user.donationHistory?.length || 0} />
-      )}
+        {user?.userType === 'donor' && (
+          <div className="hidden sm:block">
+            <DonorBadge level="gold" count={user.donationHistory?.length || 0} />
+          </div>
+        )}
+      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 h-auto p-2">
-            <Avatar className="h-8 w-8">
+          <Button variant="ghost" className="flex items-center gap-2 h-8 md:h-9 px-1 md:px-2 min-w-0">
+            <Avatar className="h-7 w-7 md:h-8 md:w-8 flex-shrink-0">
               <AvatarImage src="/placeholder.svg" alt={getUserDisplayName()} />
               <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm">
                 {getUserInitials()}
               </AvatarFallback>
             </Avatar>
-            <div className="hidden sm:block text-left">
-              <p className="text-sm font-medium">{getUserDisplayName()}</p>
-              <p className="text-xs text-muted-foreground capitalize">
+            <div className="hidden sm:block text-left min-w-0 max-w-[140px]">
+              <p className="text-sm font-medium truncate">{getUserDisplayName()}</p>
+              <p className="text-xs text-muted-foreground capitalize truncate">
                 {user?.userType || 'User'}
               </p>
             </div>

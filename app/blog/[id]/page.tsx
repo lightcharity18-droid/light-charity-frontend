@@ -9,7 +9,7 @@ import { CalendarIcon, Clock, Facebook, Linkedin, Twitter, ArrowLeft } from "luc
 import { useState, useEffect } from "react"
 import Image from "next/image"
 
-const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
 interface BlogPost {
   _id: string

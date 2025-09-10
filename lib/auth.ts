@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
 export interface User {
   _id: string
@@ -111,6 +111,7 @@ class AuthService {
 
       if (response.success && response.data) {
         this.setTokens(response.data.token, response.data.refreshToken)
+        this.setCurrentUser(response.data.user)
       }
 
       return response
@@ -128,6 +129,7 @@ class AuthService {
 
       if (response.success && response.data) {
         this.setTokens(response.data.token, response.data.refreshToken)
+        this.setCurrentUser(response.data.user)
       }
 
       return response
@@ -173,7 +175,7 @@ class AuthService {
         method: 'PUT',
       })
       // Clear local storage after successful deactivation
-      this.clearToken()
+      this.clearTokens()
     } catch (error) {
       throw error
     }
@@ -250,6 +252,12 @@ class AuthService {
     }
   }
 
+  private setCurrentUser(user: User): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('current_user', JSON.stringify(user))
+    }
+  }
+
   private clearTokens(): void {
     this.token = null
     this.refreshToken = null
@@ -257,11 +265,27 @@ class AuthService {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token')
       localStorage.removeItem('refresh_token')
+      localStorage.removeItem('current_user')
     }
   }
 
   getToken(): string | null {
     return this.token
+  }
+
+  getCurrentUser(): User | null {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('current_user')
+      if (userStr) {
+        try {
+          return JSON.parse(userStr)
+        } catch (error) {
+          console.error('Error parsing user data:', error)
+          localStorage.removeItem('current_user')
+        }
+      }
+    }
+    return null
   }
 
   isAuthenticated(): boolean {
