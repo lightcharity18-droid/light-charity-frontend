@@ -34,6 +34,8 @@ export function NavBar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  
+
   // Close mobile menu on resize
   useEffect(() => {
     const handleResize = () => {
@@ -71,6 +73,7 @@ export function NavBar() {
         <Logo />
 
         {/* Desktop Navigation */}
+         
         <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -79,6 +82,7 @@ export function NavBar() {
                 size="sm"
                 className="flex items-center gap-1 hover:text-primary hover:bg-primary/10 focus-visible-ring"
               >
+                
                 About
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -89,6 +93,7 @@ export function NavBar() {
                   <User className="h-4 w-4 mr-2" />
                   About Us
                 </Link>
+               
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/donation-process" className="flex items-center">
@@ -132,6 +137,15 @@ export function NavBar() {
           >
             Volunteer
           </Link>
+
+          
+                  <Link
+                    href="/fundraising"
+                    className="text-sm font-medium hover:text-primary transition-colors focus-visible-ring rounded-sm px-2 py-1">
+
+                    Fundraising
+                    </Link>
+                
 
           <ThemeToggle />
 
