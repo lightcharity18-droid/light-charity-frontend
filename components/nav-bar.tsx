@@ -249,6 +249,7 @@ export function NavBar() {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
+        
         <div className="lg:hidden bg-background/95 dark:bg-background/95 backdrop-blur-md border-t shadow-lg animate-slide-up">
           <div className="container py-4 space-y-2 safe-area-inset">
             {isAuthenticated && displayUser ? (
@@ -263,6 +264,7 @@ export function NavBar() {
               </>
             ) : (
               <>
+              
                 <Link
                   href="/login"
                   className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-primary/10 hover:text-primary transition-colors touch-manipulation"
@@ -298,11 +300,20 @@ export function NavBar() {
                 >
                   {item.label}
                 </Link>
+                
               ))}
+              <Link
+              href="/fundraising"
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg bg-black text-white hover:bg-gray-800 w-full"
+              onClick={() => setIsMobileMenuOpen(false)} // closes menu after click
+>
+              Fundraising
+              </Link>
             </div>
 
             {isAuthenticated && displayUser && (
               <div className="border-t border-border pt-2 mt-2">
+                
                 <Link
                   href="/dashboard/settings"
                   className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-primary/10 hover:text-primary transition-colors touch-manipulation"
