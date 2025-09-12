@@ -11,11 +11,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Bell, LogOut, Mail, Settings, User } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { useMessages } from "@/contexts/message-context"
 import { DonorBadge } from "@/components/badges/donor-badge"
 import Link from "next/link"
 
 export function DashboardHeader() {
   const { user, logout } = useAuth()
+  const { unreadCounts } = useMessages()
 
   const handleLogout = async () => {
     await logout()
@@ -50,10 +52,19 @@ export function DashboardHeader() {
           <span className="sr-only">Notifications</span>
         </Button>
         
-        <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9">
-          <Mail className="h-4 w-4 md:h-5 md:w-5" />
-          <span className="sr-only">Messages</span>
-        </Button>
+        <Link href="/dashboard/messages">
+          <Button variant="ghost" size="icon" className="relative h-8 w-8 md:h-9 md:w-9">
+            <Mail className="h-4 w-4 md:h-5 md:w-5" />
+            {unreadCounts && unreadCounts.totalUnread > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs font-medium flex items-center justify-center min-w-[20px]">
+                {unreadCounts.totalUnread > 99 ? '99+' : unreadCounts.totalUnread}
+              </span>
+            )}
+            <span className="sr-only">
+              Messages {unreadCounts && unreadCounts.totalUnread > 0 && `(${unreadCounts.totalUnread} unread)`}
+            </span>
+          </Button>
+        </Link>
 
         {user?.userType === 'donor' && (
           <div className="hidden sm:block">

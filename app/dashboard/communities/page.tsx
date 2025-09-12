@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { CreateCommunityDialog } from "@/components/community/create-community-dialog"
 import { authService } from "@/lib/auth"
+import { PlacesAutocomplete } from "@/components/ui/places-autocomplete"
 
 interface Community {
   _id: string
@@ -34,6 +35,8 @@ interface Community {
   description: string
   category: string
   type: 'public' | 'private'
+  city?: string
+  country?: string
   createdBy: {
     _id: string
     firstName?: string
@@ -92,6 +95,8 @@ export default function CommunitiesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedType, setSelectedType] = useState<string>("all")
+  const [selectedCity, setSelectedCity] = useState<string>("")
+  const [selectedCountry, setSelectedCountry] = useState<string>("")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [activeTab, setActiveTab] = useState("discover")
@@ -102,7 +107,7 @@ export default function CommunitiesPage() {
   useEffect(() => {
     fetchCommunities()
     fetchMyCommunities()
-  }, [currentPage, searchQuery, selectedCategory, selectedType])
+  }, [currentPage, searchQuery, selectedCategory, selectedType, selectedCity, selectedCountry])
 
   const fetchCommunities = async () => {
     try {
@@ -121,7 +126,9 @@ export default function CommunitiesPage() {
         limit: '12',
         ...(searchQuery && { search: searchQuery }),
         ...(selectedCategory !== 'all' && { category: selectedCategory }),
-        ...(selectedType !== 'all' && { type: selectedType })
+        ...(selectedType !== 'all' && { type: selectedType }),
+        ...(selectedCity && { city: selectedCity }),
+        ...(selectedCountry && { country: selectedCountry })
       })
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities?${params}`, {
@@ -260,6 +267,23 @@ export default function CommunitiesPage() {
               <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                 {community.description}
               </p>
+              {(community.city || community.country) && (
+                <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                  {community.city && (
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">📍</span>
+                      {community.city}
+                    </span>
+                  )}
+                  {community.city && community.country && <span>•</span>}
+                  {community.country && (
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">🌍</span>
+                      {community.country}
+                    </span>
+                  )}
+                </div>
+              )}
               <div className="flex items-center gap-2 mb-3">
                 <Badge className={`${categoryColors[community.category as keyof typeof categoryColors]} flex items-center gap-1`}>
                   <CategoryIcon className="h-3 w-3" />
@@ -371,42 +395,63 @@ export default function CommunitiesPage() {
 
         <TabsContent value="discover" className="space-y-6">
           {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search communities..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+          <div className="space-y-4">
+            {/* Search and Basic Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search communities..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="blood_donation">Blood Donation</SelectItem>
+                  <SelectItem value="health_awareness">Health Awareness</SelectItem>
+                  <SelectItem value="volunteer">Volunteer</SelectItem>
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="emergency">Emergency</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="private">Private</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="blood_donation">Blood Donation</SelectItem>
-                <SelectItem value="health_awareness">Health Awareness</SelectItem>
-                <SelectItem value="volunteer">Volunteer</SelectItem>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="emergency">Emergency</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="private">Private</SelectItem>
-              </SelectContent>
-            </Select>
+            
+            {/* Location Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <PlacesAutocomplete
+                label="Filter by City"
+                placeholder="Enter city to filter..."
+                value={selectedCity}
+                onChange={setSelectedCity}
+                type="city"
+              />
+              <PlacesAutocomplete
+                label="Filter by Country"
+                placeholder="Enter country to filter..."
+                value={selectedCountry}
+                onChange={setSelectedCountry}
+                type="country"
+              />
+            </div>
           </div>
 
           {/* Communities Grid */}
@@ -425,7 +470,7 @@ export default function CommunitiesPage() {
               <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No communities found</h3>
               <p className="text-muted-foreground mb-4">
-                {searchQuery || selectedCategory !== 'all' || selectedType !== 'all'
+                {searchQuery || selectedCategory !== 'all' || selectedType !== 'all' || selectedCity || selectedCountry
                   ? "Try adjusting your search filters"
                   : "Be the first to create a community!"
                 }

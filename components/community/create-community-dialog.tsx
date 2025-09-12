@@ -18,6 +18,7 @@ import {
 import { X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { authService } from "@/lib/auth"
+import { PlacesAutocomplete } from "@/components/ui/places-autocomplete"
 
 interface CreateCommunityDialogProps {
   open: boolean
@@ -44,7 +45,9 @@ export function CreateCommunityDialog({ open, onOpenChange, onSuccess }: CreateC
     description: "",
     category: "",
     type: "public",
-    tags: [] as string[]
+    tags: [] as string[],
+    city: "",
+    country: ""
   })
   const [newTag, setNewTag] = useState("")
   const [loading, setLoading] = useState(false)
@@ -103,7 +106,9 @@ export function CreateCommunityDialog({ open, onOpenChange, onSuccess }: CreateC
           description: formData.description.trim(),
           category: formData.category,
           type: formData.type,
-          tags: formData.tags
+          tags: formData.tags,
+          city: formData.city.trim(),
+          country: formData.country.trim()
         })
       })
 
@@ -140,7 +145,9 @@ export function CreateCommunityDialog({ open, onOpenChange, onSuccess }: CreateC
       description: "",
       category: "",
       type: "public",
-      tags: []
+      tags: [],
+      city: "",
+      country: ""
     })
     setNewTag("")
     onOpenChange(false)
@@ -172,7 +179,7 @@ export function CreateCommunityDialog({ open, onOpenChange, onSuccess }: CreateC
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-[95vw] max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Community</DialogTitle>
           <DialogDescription>
@@ -247,21 +254,40 @@ export function CreateCommunityDialog({ open, onOpenChange, onSuccess }: CreateC
             </Select>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <PlacesAutocomplete
+              label="City"
+              placeholder="Enter city..."
+              value={formData.city}
+              onChange={(value) => setFormData(prev => ({ ...prev, city: value }))}
+              type="city"
+            />
+            <PlacesAutocomplete
+              label="Country"
+              placeholder="Enter country..."
+              value={formData.country}
+              onChange={(value) => setFormData(prev => ({ ...prev, country: value }))}
+              type="country"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label>Tags (Optional)</Label>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 placeholder="Add a tag..."
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={handleKeyDown}
                 maxLength={20}
+                className="flex-1"
               />
               <Button
                 type="button"
                 variant="outline"
                 onClick={addTag}
                 disabled={!newTag.trim() || formData.tags.includes(newTag.trim()) || formData.tags.length >= 5}
+                className="sm:w-auto w-full"
               >
                 Add
               </Button>

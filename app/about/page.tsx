@@ -96,26 +96,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* About Us */}
-        <section className="py-20 bg-background">
-          <div className="container">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-4xl font-bold mb-8 text-foreground">About Us</h2>
-              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-                <p>
-                  We serve as the vital link between donors and patients, healthcare professionals, and medical
-                  researchers. As the national organization entrusted with ensuring a safe, reliable, accessible, and
-                  sustainable system of life essentials for transfusion and transplantation, we are committed to
-                  supporting the health and well-being of Canadians.
-                </p>
-                <p className="text-xl font-medium text-foreground">
-                  Each day, we work with diligence and integrity to save lives, restore health, and uphold the trust
-                  placed in us by the nation.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Mission & Vision */}
         <section className="py-20 bg-muted/30">

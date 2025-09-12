@@ -28,9 +28,9 @@ const loadGoogleMaps = (): Promise<void> => {
       return
     }
 
-    // Create script element
+    // Create script element for the new Places API
     const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&callback=initGoogleMaps`
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&callback=initGoogleMaps&v=3.56`
     script.async = true
     script.defer = true
 

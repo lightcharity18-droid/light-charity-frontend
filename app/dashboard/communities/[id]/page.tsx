@@ -25,6 +25,7 @@ import {
   Trash2
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { useMessages } from "@/contexts/message-context"
 import { useToast } from "@/hooks/use-toast"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
@@ -38,6 +39,8 @@ interface Community {
   description: string
   category: string
   type: 'public' | 'private'
+  city?: string
+  country?: string
   createdBy: {
     _id: string
     firstName?: string
@@ -128,6 +131,7 @@ export default function CommunityPage() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { user, isLoading: authLoading } = useAuth()
+  const { markCommunityAsRead } = useMessages()
   const { toast } = useToast()
   const params = useParams()
   const router = useRouter()
@@ -293,6 +297,11 @@ export default function CommunityPage() {
         const data = await response.json()
         setCommunity(data.data.community)
         setUserMembership(data.data.userMembership)
+        
+        // Mark messages as read when user opens the community
+        if (data.data.userMembership.isMember) {
+          await markCommunityAsRead(communityId)
+        }
       } else if (response.status === 404) {
         toast({
           title: "Error",
@@ -727,6 +736,23 @@ export default function CommunityPage() {
             )}
           </div>
           <p className="text-muted-foreground">{community.description}</p>
+          {(community.city || community.country) && (
+            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              {community.city && (
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">📍</span>
+                  {community.city}
+                </span>
+              )}
+              {community.city && community.country && <span>•</span>}
+              {community.country && (
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">🌍</span>
+                  {community.country}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

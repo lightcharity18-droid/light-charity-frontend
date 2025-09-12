@@ -15,11 +15,14 @@ import { toast } from "@/hooks/use-toast"
 import { authService } from "@/lib/auth"
 import { useCommunityMessages } from "@/hooks/use-websocket"
 import { CommunityMessage } from "@/lib/websocket"
+import { useMessages } from "@/contexts/message-context"
 
 interface Community {
   _id: string;
   name: string;
   description: string;
+  city?: string;
+  country?: string;
   members: Array<{
     user: {
       _id: string;
@@ -47,6 +50,14 @@ export default function MessagesPage() {
   const [isSending, setIsSending] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null) // Add current user state
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { unreadCounts, markCommunityAsRead, incrementUnreadCount } = useMessages()
+  
+  // Helper function to get unread count for a community
+  const getUnreadCount = useCallback((communityId: string) => {
+    if (!unreadCounts) return 0;
+    const community = unreadCounts.communities.find(c => c.communityId === communityId);
+    return community ? community.unreadCount : 0;
+  }, [unreadCounts]);
 
   // WebSocket connection for real-time messages
   const webSocket = useCommunityMessages(
@@ -60,6 +71,14 @@ export default function MessagesPage() {
         }
         return [...prev, message];
       });
+      
+      // If message is from a different user and not in current community, increment unread count
+      if (currentUser && message.sender._id !== currentUser._id) {
+        if (!selectedCommunity || selectedCommunity._id !== message.community) {
+          incrementUnreadCount(message.community);
+        }
+      }
+      
       // Scroll to bottom when new message arrives
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -219,13 +238,17 @@ export default function MessagesPage() {
   const selectCommunity = useCallback(async (community: Community) => {
     setSelectedCommunity(community);
     setMessages([]); // Clear previous messages
+    
+    // Mark messages as read when opening a community
+    await markCommunityAsRead(community._id);
+    
     await loadCommunityMessages(community._id);
     
     // Scroll to bottom after loading messages
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
-  }, [loadCommunityMessages]);
+  }, [loadCommunityMessages, markCommunityAsRead]);
   
   // Auto-scroll when messages change
   useEffect(() => {
@@ -337,7 +360,14 @@ export default function MessagesPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-foreground truncate">{community.name}</h3>
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-foreground truncate">{community.name}</h3>
+                          {getUnreadCount(community._id) > 0 && (
+                            <Badge variant="destructive" className="text-xs ml-2">
+                              {getUnreadCount(community._id)} new
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground truncate">{community.description}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">

@@ -282,7 +282,7 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Frequently used actions</p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   {
                     title: "Request Donation",
@@ -292,18 +292,11 @@ export default function DashboardPage() {
                     href: "/dashboard/requests",
                   },
                   {
-                    title: "Schedule Drive",
-                    description: "Organize donation events",
-                    icon: Calendar,
-                    color: "from-blue-500 to-cyan-500",
-                    href: "/dashboard/events",
-                  },
-                  {
-                    title: "Find Donors",
-                    description: "Search available donors",
-                    icon: Users,
-                    color: "from-green-500 to-emerald-500",
-                    href: "/dashboard/donors",
+                    title: "Fundraising",
+                    description: "Support our cause with donations",
+                    icon: Target,
+                    color: "from-orange-500 to-yellow-500",
+                    href: "/fundraising",
                   },
                 ].map((action, index) => (
                   <Card

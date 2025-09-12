@@ -231,3 +231,22 @@ export const useDashboardMessages = (
     communities: userCommunities
   });
 };
+
+// Hook for global message notifications (all communities)
+export const useGlobalMessages = (
+  onNewMessage?: (message: CommunityMessage, communityId: string) => void
+) => {
+  const handlers: MessageEventHandlers = {
+    onNewMessage: (message: CommunityMessage, communityId: string) => {
+      onNewMessage?.(message, communityId);
+    },
+    onError: (error: string) => {
+      console.error('Global WebSocket error:', error);
+    }
+  };
+
+  return useWebSocket(handlers, {
+    autoConnect: true,
+    communities: [] // Subscribe to all user's communities automatically
+  });
+};

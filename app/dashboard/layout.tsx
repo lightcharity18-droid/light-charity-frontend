@@ -10,6 +10,7 @@ import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { SidebarUser } from "@/components/dashboard/sidebar-user"
+import { MessageProvider } from "@/contexts/message-context"
 
 export default function DashboardLayout({
   children,
@@ -18,7 +19,8 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col bg-background">
+      <MessageProvider>
+        <div className="min-h-screen flex flex-col bg-background">
         <header className="border-b shadow-sm py-2 md:py-4 bg-card w-full">
           <div className="flex justify-between items-center h-full w-full px-4 md:px-6">
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
@@ -221,8 +223,9 @@ export default function DashboardLayout({
         <main className="flex-1 py-6 px-4 md:px-6">{children}</main>
       </div>
 
-      <ChatbotWidget />
-    </div>
+        <ChatbotWidget />
+      </div>
+      </MessageProvider>
     </ProtectedRoute>
   )
 }
