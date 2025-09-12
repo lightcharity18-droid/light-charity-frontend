@@ -30,7 +30,7 @@ const loadGoogleMaps = (): Promise<void> => {
 
     // Create script element for the new Places API
     const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&callback=initGoogleMaps&v=3.56&loading=async`
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&callback=initGoogleMaps&loading=async`
     script.async = true
     script.defer = true
 
