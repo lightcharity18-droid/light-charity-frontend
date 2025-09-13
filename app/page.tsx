@@ -218,13 +218,13 @@ export default function Home() {
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Your Impact:</span>
                         <span className="font-semibold text-orange-600 dark:text-orange-400">
-                          {(user?.donationCount || 0)} donations
+                          {(user?.donationHistory?.length || 0)} donations
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm mt-1">
                         <span className="text-muted-foreground">Lives Saved:</span>
                         <span className="font-semibold text-red-600 dark:text-red-400">
-                          {(user?.donationCount || 0) * 3}
+                          {(user?.donationHistory?.length || 0) * 3}
                         </span>
                       </div>
                     </div>

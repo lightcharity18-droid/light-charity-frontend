@@ -9,13 +9,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { MessageSquare, Send, Search, Users, ArrowLeft, Wifi, WifiOff } from "lucide-react"
+import { MessageSquare, Send, Search, Users, ArrowLeft, Wifi, WifiOff, Menu, X } from "lucide-react"
 import { Skeleton } from "@/components/ui/loading"
 import { toast } from "@/hooks/use-toast"
 import { authService } from "@/lib/auth"
 import { useCommunityMessages } from "@/hooks/use-websocket"
 import { CommunityMessage } from "@/lib/websocket"
 import { useMessages } from "@/contexts/message-context"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface Community {
   _id: string;
@@ -49,8 +50,10 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null) // Add current user state
+  const [showSidebar, setShowSidebar] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { unreadCounts, markCommunityAsRead, incrementUnreadCount } = useMessages()
+  const isMobile = useIsMobile()
   
   // Helper function to get unread count for a community
   const getUnreadCount = useCallback((communityId: string) => {
@@ -239,6 +242,11 @@ export default function MessagesPage() {
     setSelectedCommunity(community);
     setMessages([]); // Clear previous messages
     
+    // Close sidebar on mobile after selection
+    if (isMobile) {
+      setShowSidebar(false);
+    }
+    
     // Mark messages as read when opening a community
     await markCommunityAsRead(community._id);
     
@@ -248,7 +256,7 @@ export default function MessagesPage() {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
-  }, [loadCommunityMessages, markCommunityAsRead]);
+  }, [loadCommunityMessages, markCommunityAsRead, isMobile]);
   
   // Auto-scroll when messages change
   useEffect(() => {
@@ -266,6 +274,11 @@ export default function MessagesPage() {
       await loadCurrentUser(); // Load current user first
       await loadCommunities();
       setIsLoading(false);
+      
+      // Show sidebar by default on mobile if no community is selected
+      if (isMobile && !selectedCommunity) {
+        setShowSidebar(true);
+      }
     };
 
     initializeData();
@@ -306,24 +319,64 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)]">
+    <div className="flex h-[calc(100vh-80px)] relative">
+      {/* Mobile Menu Button */}
+      {isMobile && !showSidebar && selectedCommunity && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-4 left-4 z-10 md:hidden"
+          onClick={() => setShowSidebar(true)}
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+      )}
+
+      {/* Mobile Overlay */}
+      {isMobile && showSidebar && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
       {/* Communities Sidebar */}
-      <div className="w-1/3 border-r bg-card flex flex-col">
+      <div className={`
+        ${isMobile 
+          ? `fixed left-0 top-0 h-full w-80 z-50 transform transition-transform duration-300 ${
+              showSidebar ? 'translate-x-0' : '-translate-x-full'
+            }`
+          : 'w-1/3 relative'
+        } 
+        border-r bg-card flex flex-col
+      `}>
         {/* Header */}
         <div className="p-4 border-b">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold text-foreground">Communities</h1>
-            {webSocket.isConnected ? (
-              <div className="flex items-center gap-1 text-green-500">
-                <Wifi className="h-4 w-4" />
-                <span className="text-xs">Live</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 text-red-500">
-                <WifiOff className="h-4 w-4" />
-                <span className="text-xs">Offline</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {webSocket.isConnected ? (
+                <div className="flex items-center gap-1 text-green-500">
+                  <Wifi className="h-4 w-4" />
+                  <span className="text-xs">Live</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-red-500">
+                  <WifiOff className="h-4 w-4" />
+                  <span className="text-xs">Offline</span>
+                </div>
+              )}
+              {isMobile && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSidebar(false)}
+                  className="md:hidden"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
           
           {/* Search */}
@@ -394,26 +447,18 @@ export default function MessagesPage() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className={`flex-1 flex flex-col ${isMobile && showSidebar ? 'hidden' : ''}`}>
         {selectedCommunity ? (
           <>
             {/* Chat Header */}
             <div className="p-4 border-b bg-card">
               <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedCommunity(null)}
-                  className="lg:hidden"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <Avatar className="h-10 w-10">
+                <Avatar className={`h-10 w-10 ${isMobile ? 'ml-12' : ''}`}>
                   <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                     <Users className="h-5 w-5" />
                   </AvatarFallback>
                 </Avatar>
-                <div>
+                <div className="flex-1">
                   <h2 className="font-semibold text-foreground">{selectedCommunity.name}</h2>
                   <p className="text-sm text-muted-foreground">
                     {selectedCommunity.stats.memberCount} members
@@ -423,7 +468,7 @@ export default function MessagesPage() {
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
+            <ScrollArea className={`flex-1 ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="space-y-4">
                 {messages.length > 0 ? (
                   <>
@@ -447,11 +492,13 @@ export default function MessagesPage() {
                       return (
                         <div
                           key={message._id}
-                          className={`flex mb-4 w-full ${isOwn ? 'justify-end' : 'justify-start'}`}
+                          className={`flex ${isMobile ? 'mb-3' : 'mb-4'} w-full ${isOwn ? 'justify-end' : 'justify-start'}`}
                         >
-                          <div className={`flex gap-3 max-w-[70%] ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
+                          <div className={`flex gap-3 ${
+                            isMobile ? 'max-w-[85%]' : 'max-w-[70%]'
+                          } ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
                             {!isOwn && (
-                              <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                              <Avatar className={`${isMobile ? 'h-7 w-7' : 'h-8 w-8'} mt-1 flex-shrink-0`}>
                                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs">
                                   {senderName.split(' ').map(n => n[0]).join('')}
                                 </AvatarFallback>
@@ -474,13 +521,15 @@ export default function MessagesPage() {
                               )}
                               
                               <div
-                                className={`px-4 py-3 relative group shadow-sm break-words w-fit ${
+                                className={`${
+                                  isMobile ? 'px-3 py-2' : 'px-4 py-3'
+                                } relative group shadow-sm break-words w-fit ${
                                   isOwn
                                     ? 'bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-2xl rounded-bl-2xl rounded-br-md'
                                     : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-t-2xl rounded-br-2xl rounded-bl-md'
                                 }`}
                               >
-                                <p className="text-sm leading-relaxed">{message.content}</p>
+                                <p className={`${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed`}>{message.content}</p>
                               </div>
 
                               {isOwn && (
@@ -511,25 +560,31 @@ export default function MessagesPage() {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="p-4 border-t bg-card">
-              <div className="flex gap-2">
-                <Input
+            <div className={`p-4 border-t bg-card ${isMobile ? 'pb-safe-area-inset-bottom' : ''}`}>
+              <div className="flex gap-2 items-end">
+                <Textarea
                   placeholder="Type your message..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       sendMessage();
                     }
                   }}
-                  className="flex-1 bg-background border-border"
+                  className={`flex-1 bg-background border-border resize-none ${
+                    isMobile ? 'min-h-[44px] max-h-[120px]' : 'min-h-[40px] max-h-[100px]'
+                  }`}
+                  rows={1}
                   disabled={isSending}
                 />
                 <Button
                   onClick={sendMessage}
                   disabled={isSending || !newMessage.trim()}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                  size={isMobile ? "default" : "sm"}
+                  className={`bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white ${
+                    isMobile ? 'px-4 py-3 min-h-[44px]' : 'px-3'
+                  }`}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -539,10 +594,25 @@ export default function MessagesPage() {
         ) : (
           /* No Community Selected */
           <div className="flex-1 flex items-center justify-center bg-muted/20">
-            <div className="text-center text-muted-foreground">
+            <div className="text-center text-muted-foreground px-4">
               <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-50" />
               <h2 className="text-xl font-semibold mb-2">Select a Community</h2>
-              <p>Choose a community from the sidebar to start messaging</p>
+              <p className="text-sm md:text-base">
+                {isMobile 
+                  ? "Tap the menu button to browse communities" 
+                  : "Choose a community from the sidebar to start messaging"
+                }
+              </p>
+              {isMobile && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSidebar(true)}
+                  className="mt-4"
+                >
+                  <Menu className="h-4 w-4 mr-2" />
+                  Browse Communities
+                </Button>
+              )}
             </div>
           </div>
         )}
