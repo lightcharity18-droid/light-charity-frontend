@@ -673,6 +673,11 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/fundraising" className="text-gray-400 hover:text-orange-400 transition-colors">
+                    Fundraising
+                  </Link>
+                </li>
+                <li>
                   <Link href="/blog" className="text-gray-400 hover:text-orange-400 transition-colors">
                     Blog & News
                   </Link>
