@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Users, Calendar, Mail, MapPin, Settings, Droplet, MessageCircle } from "lucide-react"
+import { Home, Users, Calendar, Mail, MapPin, Settings, Droplet, MessageCircle, Heart } from "lucide-react"
 
 const navItems = [
   {
@@ -20,6 +20,11 @@ const navItems = [
     href: "/donate",
     label: "Donate Blood",
     icon: Droplet,
+  },
+  {
+    href: "/organ-donation",
+    label: "Organ Donation",
+    icon: Heart,
   },
   {
     href: "/dashboard/donations",

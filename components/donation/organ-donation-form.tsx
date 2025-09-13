@@ -1,16 +1,7 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-
-// Type definitions for geolocation
-interface GeolocationAddress {
-  city: string
-  fullAddress: string
-  country: string
-  state: string
-}
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,23 +13,46 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
-import { Loader2, CalendarIcon, MapPin } from "lucide-react"
+import { Loader2, CalendarIcon, MapPin, Heart } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { DonationConfirmationModal } from "./donation-confirmation-modal"
+import { OrganDonationConfirmationModal } from "./organ-donation-confirmation-modal"
 
-export function DonationForm() {
-  const [bloodGroup, setBloodGroup] = useState("")
+// Type definitions for geolocation
+interface GeolocationAddress {
+  city: string
+  fullAddress: string
+  country: string
+  state: string
+}
+
+export function OrganDonationForm() {
+  const [organsToDonate, setOrgansToDonate] = useState<string[]>([])
   const [date, setDate] = useState<Date>()
   const [location, setLocation] = useState("")
   const [notes, setNotes] = useState("")
   const [healthCondition, setHealthCondition] = useState(false)
+  const [familyConsent, setFamilyConsent] = useState(false)
+  const [medicalHistory, setMedicalHistory] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [city, setCity] = useState("")
   const { toast } = useToast()
   const { user, isAuthenticated } = useAuth()
+
+  const organOptions = [
+    { value: "heart", label: "Heart", description: "Can save 1 life" },
+    { value: "liver", label: "Liver", description: "Can save 1 life" },
+    { value: "kidneys", label: "Kidneys", description: "Can save 2 lives" },
+    { value: "lungs", label: "Lungs", description: "Can save 2 lives" },
+    { value: "pancreas", label: "Pancreas", description: "Can save 1 life" },
+    { value: "intestines", label: "Intestines", description: "Can save 1 life" },
+    { value: "corneas", label: "Corneas", description: "Can restore sight to 2 people" },
+    { value: "skin", label: "Skin", description: "Can help burn victims" },
+    { value: "bone", label: "Bone", description: "Can help with reconstructive surgery" },
+    { value: "tendons", label: "Tendons", description: "Can help with joint reconstruction" },
+  ]
 
   useEffect(() => {
     // Try to get user's location when component mounts
@@ -153,6 +167,14 @@ export function DonationForm() {
     }
   }
 
+  const handleOrganChange = (organValue: string, checked: boolean) => {
+    if (checked) {
+      setOrgansToDonate(prev => [...prev, organValue])
+    } else {
+      setOrgansToDonate(prev => prev.filter(organ => organ !== organValue))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -160,17 +182,17 @@ export function DonationForm() {
     if (!isAuthenticated) {
       toast({
         title: "Authentication required",
-        description: "Please log in to schedule a donation.",
+        description: "Please log in to register for organ donation.",
         variant: "destructive",
       })
       return
     }
 
     // Form validation
-    if (!bloodGroup) {
+    if (organsToDonate.length === 0) {
       toast({
         title: "Missing information",
-        description: "Please select your blood group.",
+        description: "Please select at least one organ you wish to donate.",
         variant: "destructive",
       })
       return
@@ -179,7 +201,7 @@ export function DonationForm() {
     if (!date) {
       toast({
         title: "Missing information",
-        description: "Please select a donation date.",
+        description: "Please select a registration date.",
         variant: "destructive",
       })
       return
@@ -188,7 +210,7 @@ export function DonationForm() {
     if (!location) {
       toast({
         title: "Missing information",
-        description: "Please enter a donation location.",
+        description: "Please enter your location.",
         variant: "destructive",
       })
       return
@@ -197,7 +219,16 @@ export function DonationForm() {
     if (!healthCondition) {
       toast({
         title: "Health confirmation required",
-        description: "Please confirm you're in good health to donate.",
+        description: "Please confirm you understand the health requirements.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!familyConsent) {
+      toast({
+        title: "Family consent required",
+        description: "Please confirm you have discussed this with your family.",
         variant: "destructive",
       })
       return
@@ -209,31 +240,33 @@ export function DonationForm() {
       const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
       const token = localStorage.getItem('auth_token')
 
-      const response = await fetch(`${API_BASE_URL}/api/donations/schedule`, {
+      const response = await fetch(`${API_BASE_URL}/api/organ-donations/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          bloodGroup,
-          scheduledDate: date.toISOString(),
+          organsToDonate,
+          registrationDate: date.toISOString(),
           location,
           notes,
+          medicalHistory,
           healthConfirmed: healthCondition,
+          familyConsent,
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to schedule donation')
+        throw new Error(data.message || 'Failed to register for organ donation')
       }
 
       // Show confirmation modal
       setShowConfirmation(true)
     } catch (error: any) {
-      console.error('Error scheduling donation:', error)
+      console.error('Error registering for organ donation:', error)
       toast({
         title: "Something went wrong",
         description: error.message || "Please try again later.",
@@ -248,15 +281,17 @@ export function DonationForm() {
     setShowConfirmation(false)
 
     // Reset form
-    setBloodGroup("")
+    setOrgansToDonate([])
     setDate(undefined)
     setLocation("")
     setNotes("")
+    setMedicalHistory("")
     setHealthCondition(false)
+    setFamilyConsent(false)
 
     toast({
-      title: "Donation scheduled",
-      description: "Thank you for your donation! We'll see you soon.",
+      title: "Registration successful",
+      description: "Thank you for registering as an organ donor! You're a hero.",
     })
   }
 
@@ -264,41 +299,54 @@ export function DonationForm() {
     <>
       <Card className="w-full max-w-2xl shadow-soft">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Schedule Blood Donation</CardTitle>
-          <CardDescription>Fill out the form below to schedule your blood donation</CardDescription>
+          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <Heart className="h-6 w-6 text-primary" />
+            Organ Donation Registration
+          </CardTitle>
+          <CardDescription>
+            Register to become an organ donor and give the gift of life. Your decision can save multiple lives.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {city && (
-            <div className="bg-red-50 p-3 rounded-md mb-6 flex items-center">
+            <div className="bg-green-50 p-3 rounded-md mb-6 flex items-center">
               <MapPin className="h-5 w-5 text-primary mr-2" />
               <p className="text-sm">
-                You&apos;re donating from <strong>{city}</strong>
+                You&apos;re registering from <strong>{city}</strong>
               </p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="bloodGroup">Blood Group</Label>
-              <Select value={bloodGroup} onValueChange={setBloodGroup} disabled={isLoading}>
-                <SelectTrigger id="bloodGroup" className="w-full">
-                  <SelectValue placeholder="Select your blood group" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="A+">A+</SelectItem>
-                  <SelectItem value="A-">A-</SelectItem>
-                  <SelectItem value="B+">B+</SelectItem>
-                  <SelectItem value="B-">B-</SelectItem>
-                  <SelectItem value="AB+">AB+</SelectItem>
-                  <SelectItem value="AB-">AB-</SelectItem>
-                  <SelectItem value="O+">O+</SelectItem>
-                  <SelectItem value="O-">O-</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-4">
+              <Label className="text-base font-semibold">Organs I Wish to Donate</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {organOptions.map((organ) => (
+                  <div key={organ.value} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <Checkbox
+                      id={organ.value}
+                      checked={organsToDonate.includes(organ.value)}
+                      onCheckedChange={(checked) => handleOrganChange(organ.value, checked as boolean)}
+                      disabled={isLoading}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label
+                        htmlFor={organ.value}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {organ.label}
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        {organ.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="date">Date of Donation</Label>
+              <Label htmlFor="date">Registration Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -340,7 +388,7 @@ export function DonationForm() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="location">Donation Location</Label>
+                <Label htmlFor="location">Location</Label>
                 <Button
                   type="button"
                   variant="ghost"
@@ -366,8 +414,20 @@ export function DonationForm() {
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Enter donation center or hospital name"
+                placeholder="Enter your city or address"
                 disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="medicalHistory">Medical History</Label>
+              <Textarea
+                id="medicalHistory"
+                value={medicalHistory}
+                onChange={(e) => setMedicalHistory(e.target.value)}
+                placeholder="Please describe any relevant medical conditions, surgeries, or medications"
+                disabled={isLoading}
+                rows={3}
               />
             </div>
 
@@ -377,29 +437,53 @@ export function DonationForm() {
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any additional information we should know"
+                placeholder="Any additional information or special requests"
                 disabled={isLoading}
+                rows={2}
               />
             </div>
 
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="healthCondition"
-                checked={healthCondition}
-                onCheckedChange={(checked) => setHealthCondition(checked as boolean)}
-                disabled={isLoading}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <Label
-                  htmlFor="healthCondition"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Health Confirmation
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  I confirm that I am in good health, have not donated blood in the last 3 months, and have not had any
-                  recent illnesses or surgeries.
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="healthCondition"
+                  checked={healthCondition}
+                  onCheckedChange={(checked) => setHealthCondition(checked as boolean)}
+                  disabled={isLoading}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label
+                    htmlFor="healthCondition"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Health Understanding
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    I understand that organ donation is a medical decision that will be evaluated at the time of need, 
+                    and that my organs will only be used if they are medically suitable and can help save lives.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="familyConsent"
+                  checked={familyConsent}
+                  onCheckedChange={(checked) => setFamilyConsent(checked as boolean)}
+                  disabled={isLoading}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label
+                    htmlFor="familyConsent"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Family Discussion
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    I have discussed my decision to become an organ donor with my family and loved ones, 
+                    and they understand and support my choice.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -407,24 +491,29 @@ export function DonationForm() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
+                  Registering...
                 </>
               ) : (
-                "Schedule Donation"
+                <>
+                  <Heart className="mr-2 h-4 w-4" />
+                  Register as Organ Donor
+                </>
               )}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <DonationConfirmationModal
+      <OrganDonationConfirmationModal
         isOpen={showConfirmation}
         onClose={() => setShowConfirmation(false)}
         onComplete={handleConfirmationComplete}
-        bloodGroup={bloodGroup}
+        organsToDonate={organsToDonate}
         date={date}
         location={location}
       />
     </>
   )
 }
+
+export { OrganDonationForm }

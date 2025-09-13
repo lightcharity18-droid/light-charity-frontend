@@ -19,6 +19,9 @@ import {
   Minimize2,
   Maximize2,
   RotateCcw,
+  Heart,
+  Target,
+  Loader2
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { LoadingSpinner } from "@/components/ui/loading"
@@ -487,6 +490,14 @@ What specific information can I provide for you?`
         router.push("/donate")
         setIsOpen(false)
         break
+      case "organ-donate":
+        router.push("/organ-donation")
+        setIsOpen(false)
+        break
+      case "fundraising":
+        router.push("/fundraising")
+        setIsOpen(false)
+        break
       default:
         break
     }
@@ -535,9 +546,15 @@ What specific information can I provide for you?`
       color: "bg-red-500 hover:bg-red-600",
     },
     {
-      id: "check-availability",
-      label: "Check Blood Availability",
-      icon: Droplet,
+      id: "organ-donate",
+      label: "Organ Donation",
+      icon: Heart,
+      color: "bg-purple-500 hover:bg-purple-600",
+    },
+    {
+      id: "fundraising",
+      label: "Fundraising",
+      icon: Target,
       color: "bg-orange-500 hover:bg-orange-600",
     },
   ]

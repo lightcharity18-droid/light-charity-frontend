@@ -663,6 +663,11 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/organ-donation" className="text-gray-400 hover:text-orange-400 transition-colors">
+                    Organ Donation
+                  </Link>
+                </li>
+                <li>
                   <Link href="/volunteer" className="text-gray-400 hover:text-orange-400 transition-colors">
                     Volunteer
                   </Link>

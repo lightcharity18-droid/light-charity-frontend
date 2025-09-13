@@ -282,14 +282,21 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Frequently used actions</p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   {
-                    title: "Request Donation",
-                    description: "Send urgent blood requests",
+                    title: "Donate Blood",
+                    description: "Schedule your blood donation",
                     icon: Heart,
                     color: "from-red-500 to-pink-500",
-                    href: "/dashboard/requests",
+                    href: "/donate",
+                  },
+                  {
+                    title: "Organ Donation",
+                    description: "Register as an organ donor",
+                    icon: Heart,
+                    color: "from-green-500 to-emerald-500",
+                    href: "/organ-donation",
                   },
                   {
                     title: "Fundraising",
