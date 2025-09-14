@@ -183,6 +183,35 @@ export default function AboutPage() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Canadian Blood Services Partnership */}
+              <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden w-full max-w-sm mx-auto">
+                <CardContent className="p-0">
+                  <div className="h-48 bg-white flex items-center justify-center relative overflow-hidden">
+                    <div className="p-4">
+                      <Link 
+                        href="https://www.blood.ca/en/blood/donating-blood/new-donor" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <img 
+                          src="/images/canadian-blood-services-partnership.svg.png" 
+                          alt="Canadian Blood Services Partnership" 
+                          className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
+                        />
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3 className="font-semibold text-lg mb-2 text-foreground">Canadian Blood Services</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Official blood donation partner
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Placeholder for future partners */}
               {[
                 {
                   color: "from-orange-400 to-red-400",
@@ -192,9 +221,6 @@ export default function AboutPage() {
                 },
                 {
                   color: "from-orange-500 to-red-500",
-                },
-                {
-                  color: "from-red-500 to-orange-500",
                 },
               ].map((member, index) => (
                 <Card key={index} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">

@@ -23,7 +23,7 @@ import {
   Target,
   Loader2
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { LoadingSpinner } from "@/components/ui/loading"
 import { cn } from "@/lib/utils"
 import { MessageRenderer } from "./message-renderer"
@@ -48,6 +48,29 @@ export function ChatbotWidget() {
   const [isConnected, setIsConnected] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const pathname = usePathname()
+
+  // Check if we're in community chat mode - be more explicit about paths
+  const isInCommunityChat = pathname === '/dashboard/messages' || 
+                           pathname?.startsWith('/dashboard/messages/') ||
+                           pathname?.startsWith('/dashboard/communities/') ||
+                           pathname?.includes('/communities/')
+
+  // Debug logging
+  useEffect(() => {
+    console.log('ChatbotWidget Debug:', {
+      pathname,
+      isInCommunityChat,
+      isOpen
+    })
+  }, [pathname, isInCommunityChat, isOpen])
+
+  // Close chatbot when entering community chat mode
+  useEffect(() => {
+    if (isInCommunityChat && isOpen) {
+      setIsOpen(false)
+    }
+  }, [isInCommunityChat, isOpen])
 
   useEffect(() => {
     // Initialize session ID when component mounts
@@ -558,6 +581,14 @@ What specific information can I provide for you?`
       color: "bg-orange-500 hover:bg-orange-600",
     },
   ]
+
+  // Don't render the chatbot widget when in community chat mode
+  if (isInCommunityChat) {
+    console.log('ChatbotWidget: Hidden due to community chat mode')
+    return null
+  }
+
+  console.log('ChatbotWidget: Rendering normally')
 
   return (
     <div className="fixed bottom-4 right-4 z-50 safe-area-inset">
