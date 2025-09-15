@@ -129,7 +129,7 @@ export default function VolunteerPage() {
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">Volunteer With Us</h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Not everyone can donate blood, but everyone can help save lives. Join our team of dedicated volunteers
+                Not everyone can donate, but everyone can help save lives. Join our team of dedicated volunteers
                 and make a difference in your community.
               </p>
             </div>

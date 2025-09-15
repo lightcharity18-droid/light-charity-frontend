@@ -195,7 +195,7 @@ export default function AboutPage() {
                         className="block"
                       >
                         <img 
-                          src="/images/canadian-blood-services-partnership.svg.png" 
+                          src="/images/canadian-blood-services-partnership.png" 
                           alt="Canadian Blood Services Partnership" 
                           className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
                         />
@@ -211,6 +211,34 @@ export default function AboutPage() {
                 </CardContent>
               </Card>
 
+              {/* The Tabios Foundation Partnership */}
+              <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden w-full max-w-sm mx-auto">
+                <CardContent className="p-0">
+                  <div className="h-48 bg-white flex items-center justify-center relative overflow-hidden">
+                    <div className="p-4">
+                      <Link 
+                        href="https://thetabiosfoundation.org/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <img 
+                          src="/images/tabios-foundation-logo.png" 
+                          alt="The Tabios Foundation Partnership" 
+                          className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
+                        />
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3 className="font-semibold text-lg mb-2 text-foreground">The Tabios Foundation</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Mental health awareness and veteran support partner
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Placeholder for future partners */}
               {[
                 {
@@ -218,9 +246,6 @@ export default function AboutPage() {
                 },
                 {
                   color: "from-red-400 to-orange-400",
-                },
-                {
-                  color: "from-orange-500 to-red-500",
                 },
               ].map((member, index) => (
                 <Card key={index} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -255,7 +280,7 @@ export default function AboutPage() {
                 <Button size="lg" variant="secondary" className="bg-white text-orange-600 hover:bg-gray-100" asChild>
                   <Link href="/donate">
                     <Heart className="h-4 w-4 mr-2" />
-                    Become a Donor
+                    Become a Blood Donor
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" asChild>

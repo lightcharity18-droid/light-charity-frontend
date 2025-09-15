@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -51,7 +52,12 @@ export default function MessagesPage() {
   const [isSending, setIsSending] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null) // Add current user state
   const [showSidebar, setShowSidebar] = useState(false)
+  const [loadingOlderMessages, setLoadingOlderMessages] = useState(false)
+  const [hasMoreMessages, setHasMoreMessages] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [loadingMessages, setLoadingMessages] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesTopRef = useRef<HTMLDivElement>(null)
   const { unreadCounts, markCommunityAsRead, incrementUnreadCount } = useMessages()
   const isMobile = useIsMobile()
   
@@ -138,10 +144,12 @@ export default function MessagesPage() {
   // Load messages for selected community
   const loadCommunityMessages = useCallback(async (communityId: string) => {
     try {
+      setLoadingMessages(true);
       const token = authService.getToken();
       if (!token || !authService.isAuthenticated()) return;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
+      // Load recent messages first (for initial load)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&limit=50`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -149,7 +157,12 @@ export default function MessagesPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessages(data.data.messages || []);
+        const newMessages = data.data.messages || [];
+        setMessages(newMessages);
+        
+        // Reset pagination state for new community
+        setCurrentPage(1);
+        setHasMoreMessages(newMessages.length === 50); // If we got 50 messages, there might be more
       }
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -158,8 +171,75 @@ export default function MessagesPage() {
         description: "Failed to load messages",
         variant: "destructive"
       });
+    } finally {
+      setLoadingMessages(false);
     }
   }, []);
+
+  // Load older messages for infinite scroll
+  const loadOlderMessages = useCallback(async () => {
+    if (!selectedCommunity || loadingOlderMessages || !hasMoreMessages) return;
+
+    try {
+      setLoadingOlderMessages(true);
+      const token = authService.getToken();
+      if (!token || !authService.isAuthenticated()) return;
+
+      const nextPage = currentPage + 1;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${selectedCommunity._id}/messages?page=${nextPage}&limit=50`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const olderMessages = data.data.messages || [];
+        
+        if (olderMessages.length > 0) {
+          // Prepend older messages to the beginning
+          setMessages(prev => [...olderMessages, ...prev]);
+          setCurrentPage(nextPage);
+          
+          // Check if there are more messages
+          setHasMoreMessages(olderMessages.length === 50);
+        } else {
+          setHasMoreMessages(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading older messages:', error);
+    } finally {
+      setLoadingOlderMessages(false);
+    }
+  }, [selectedCommunity, loadingOlderMessages, hasMoreMessages, currentPage]);
+
+  // Preload messages for a community (for hover effect)
+  const preloadCommunityMessages = useCallback(async (communityId: string) => {
+    if (selectedCommunity?._id === communityId || loadingMessages) return;
+    
+    try {
+      const token = authService.getToken();
+      if (!token || !authService.isAuthenticated()) return;
+
+      // Preload messages without updating state
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&limit=50`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    } catch (error) {
+      // Silently fail for preload
+      console.log('Preload failed:', error);
+    }
+  }, [selectedCommunity, loadingMessages]);
+
+  // Infinite scroll for loading older messages
+  const infiniteScrollRef = useInfiniteScroll(loadOlderMessages, {
+    hasMore: hasMoreMessages,
+    loading: loadingOlderMessages,
+    threshold: 200
+  });
 
   // Send message to community
   const sendMessage = async () => {
@@ -239,8 +319,8 @@ export default function MessagesPage() {
 
   // Handle community selection
   const selectCommunity = useCallback(async (community: Community) => {
-    setSelectedCommunity(community);
-    setMessages([]); // Clear previous messages
+    // Don't do anything if it's the same community
+    if (selectedCommunity?._id === community._id) return;
     
     // Close sidebar on mobile after selection
     if (isMobile) {
@@ -250,22 +330,29 @@ export default function MessagesPage() {
     // Mark messages as read when opening a community
     await markCommunityAsRead(community._id);
     
+    // Load messages first, then update selected community
     await loadCommunityMessages(community._id);
     
-    // Scroll to bottom after loading messages
+    // Update selected community after messages are loaded
+    setSelectedCommunity(community);
+    
+    // Scroll to bottom immediately without animation for initial load
     setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
-  }, [loadCommunityMessages, markCommunityAsRead, isMobile]);
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    }, 50);
+  }, [loadCommunityMessages, markCommunityAsRead, isMobile, selectedCommunity]);
   
-  // Auto-scroll when messages change
+  // Auto-scroll only for new messages, not initial load
   useEffect(() => {
-    if (messages.length > 0) {
-      setTimeout(() => {
+    if (messages.length > 0 && selectedCommunity) {
+      // Only smooth scroll for new messages (not initial load)
+      const timeoutId = setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [messages.length]);
+  }, [messages.length, selectedCommunity]);
 
   // Initialize data and set up periodic refresh
   useEffect(() => {
@@ -404,6 +491,7 @@ export default function MessagesPage() {
                       : "border-border"
                   }`}
                   onClick={() => selectCommunity(community)}
+                  onMouseEnter={() => preloadCommunityMessages(community._id)}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start gap-3">
@@ -469,8 +557,63 @@ export default function MessagesPage() {
 
             {/* Messages */}
             <ScrollArea className={`flex-1 ${isMobile ? 'p-3' : 'p-4'}`}>
-              <div className="space-y-4">
-                {messages.length > 0 ? (
+              <div className="space-y-4 transition-opacity duration-200 ease-in-out">
+                {/* Infinite scroll trigger for loading older messages */}
+                <div ref={infiniteScrollRef} className="h-1" />
+                
+                {/* Loading indicator for older messages */}
+                {loadingOlderMessages && (
+                  <div className="flex justify-center py-4">
+                    <div className="flex items-center space-x-2 text-muted-foreground">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                      <span className="text-sm">Loading older messages...</span>
+                    </div>
+                  </div>
+                )}
+                
+                {loadingMessages ? (
+                  // Skeleton loading for messages
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, index) => (
+                      <div key={index} className={`flex ${index % 2 === 0 ? 'justify-end' : 'justify-start'} w-full`}>
+                        <div className={`flex gap-3 ${
+                          isMobile ? 'max-w-[85%]' : 'max-w-[70%]'
+                        } ${index % 2 === 0 ? 'flex-row-reverse' : 'flex-row'}`}>
+                          {index % 2 !== 0 && (
+                            <div className={`${isMobile ? 'h-7 w-7' : 'h-8 w-8'} mt-1 flex-shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse`} />
+                          )}
+                          <div className={`flex flex-col ${index % 2 === 0 ? 'items-end' : 'items-start'}`}>
+                            {index % 2 !== 0 && (
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                                <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              </div>
+                            )}
+                            <div className={`${
+                              isMobile ? 'px-3 py-2' : 'px-4 py-3'
+                            } relative group shadow-sm break-words w-fit ${
+                              index % 2 === 0
+                                ? 'bg-gray-200 dark:bg-gray-700 rounded-t-2xl rounded-bl-2xl rounded-br-md'
+                                : 'bg-gray-200 dark:bg-gray-700 rounded-t-2xl rounded-br-2xl rounded-bl-md'
+                            } animate-pulse`}>
+                              <div className={`${isMobile ? 'h-4' : 'h-4'} ${
+                                index === 0 ? 'w-24' : 
+                                index === 1 ? 'w-40' : 
+                                index === 2 ? 'w-32' : 
+                                index === 3 ? 'w-48' : 'w-28'
+                              } bg-gray-300 dark:bg-gray-600 rounded`} />
+                            </div>
+                            {index % 2 === 0 && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : messages.length > 0 ? (
                   <>
                     {messages.map((message) => {
                       // Improved isOwn check with better error handling

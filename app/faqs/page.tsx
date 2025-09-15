@@ -5,196 +5,192 @@ import { NavBar } from "@/components/nav-bar"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Heart, HelpCircle, Users, Shield, Clock, Phone } from "lucide-react"
+import { Heart, HelpCircle, Users, Shield, Clock, Phone, Gift, DollarSign } from "lucide-react"
 import Link from "next/link"
 
 // FAQ Data organized by categories
 const faqData = {
-  general: [
+  blood: [
     {
-      id: "general-1",
+      id: "blood-1",
       question: "Why should I donate blood?",
       answer:
         "Blood donation is a critical and selfless act that directly saves lives. When you donate blood, you're helping accident victims, surgery patients, cancer patients, and many others who depend on blood transfusions. A single donation can save up to three lives, making it one of the most impactful ways to help others.",
     },
     {
-      id: "general-2",
+      id: "blood-2",
+      question: "Who is eligible to donate blood?",
+      answer:
+        "Generally, individuals aged 17 and older, weighing at least 110 pounds, and in good health are eligible. Basic eligibility includes: At least 17 years old (16 with parental consent in some states), weigh at least 110 pounds, be in good general health, and feel well on donation day.",
+    },
+    {
+      id: "blood-3",
       question: "How often can I donate blood?",
       answer:
-        "Donation frequency depends on the type of donation: Whole Blood every 8 weeks (56 days), Double Red Cells every 16 weeks (112 days), and Platelets every 7 days (up to 24 times per year).",
+        "Whole blood donations can typically be made every 56 days. Donation frequency depends on the type of donation: Whole Blood every 8 weeks (56 days), Double Red Cells every 16 weeks (112 days), and Platelets every 7 days (up to 24 times per year).",
     },
     {
-      id: "general-3",
-      question: "Is donating blood safe?",
+      id: "blood-4",
+      question: "What should I do to prepare for blood donation?",
       answer:
-        "Yes, donating blood is very safe. All equipment used is sterile and disposed of after a single use. The donation process is conducted by trained professionals who follow strict safety protocols with a 99.9% safety rate.",
+        "Stay hydrated, eat a healthy meal before donating, and bring a valid ID. Eat a healthy meal, drink plenty of water, get a good night's sleep, and avoid alcohol for 24 hours before donation. Bring your ID and wear comfortable clothing with sleeves that can be rolled up.",
     },
     {
-      id: "general-4",
+      id: "blood-5",
+      question: "Are there any risks associated with donating blood?",
+      answer:
+        "Blood donation is safe. Some may experience minor side effects like dizziness or bruising. Most people experience no side effects. Some may have slight fatigue, mild thirst, or temporary lightheadedness. Rare side effects include bruising at the needle site, fainting, or nausea.",
+    },
+    {
+      id: "blood-6",
+      question: "How can I find a blood donation center near me?",
+      answer:
+        "Visit the American Red Cross website or contact local hospitals and blood banks. You can also use our location finder on our website to find the nearest donation center to you.",
+    },
+    {
+      id: "blood-7",
       question: "How long does a blood donation take?",
       answer:
         "The entire process takes about an hour: Registration & Health Check (15-20 min), Actual Donation (8-10 min), and Rest & Refreshments (15 min).",
     },
     {
-      id: "general-5",
+      id: "blood-8",
       question: "What happens to my blood after donation?",
       answer:
         "Your donated blood is tested, processed, and separated into components (red cells, plasma, platelets) that can help multiple patients. It's then distributed to hospitals and medical centers where it's needed most.",
     },
+  ],
+  organ: [
     {
-      id: "general-6",
-      question: "Can I donate blood if I have tattoos or piercings?",
+      id: "organ-1",
+      question: "How do I become an organ donor?",
       answer:
-        "Yes, you can donate blood if you have tattoos or piercings, as long as they were done at a licensed facility using sterile equipment. There may be a waiting period depending on when you got them.",
+        "Register through your state's donor registry, typically available online or at the DMV. You can also indicate your wish to donate on your driver's license or state ID card.",
     },
     {
-      id: "general-7",
-      question: "Do I get paid for donating blood?",
+      id: "organ-2",
+      question: "Can I specify which organs I want to donate?",
       answer:
-        "No, blood donation is a voluntary, unpaid service. However, you'll receive refreshments after donation and the satisfaction of knowing you've helped save lives.",
+        "Yes, you can specify which organs and tissues you wish to donate. When you register, you'll have the option to choose which organs and tissues you're comfortable donating.",
     },
     {
-      id: "general-8",
-      question: "Can I donate blood during my lunch break?",
+      id: "organ-3",
+      question: "Does my age or medical history affect my ability to donate organs?",
       answer:
-        "Yes! The entire process takes about an hour, making it perfect for a lunch break. We recommend eating a good meal beforehand and staying hydrated.",
+        "Most people can donate, regardless of age or medical history. Medical professionals will assess suitability at the time of donation. There's no upper age limit for organ donation as long as you're healthy and meet all other eligibility requirements.",
+    },
+    {
+      id: "organ-4",
+      question: "Will organ donation affect funeral arrangements?",
+      answer:
+        "Organ donation does not interfere with traditional funeral arrangements, including open-casket services. The donation process is conducted with the utmost respect and care.",
+    },
+    {
+      id: "organ-5",
+      question: "Is there a cost to my family for organ donation?",
+      answer:
+        "No, all costs related to organ donation are covered by the transplant organization. Your family will not incur any expenses related to the donation process.",
+    },
+    {
+      id: "organ-6",
+      question: "Can I change my mind about organ donation?",
+      answer:
+        "Yes, you can change your organ donation status at any time by updating your registration with your state's donor registry or by updating your driver's license information.",
+    },
+    {
+      id: "organ-7",
+      question: "What organs and tissues can be donated?",
+      answer:
+        "Organs that can be donated include heart, lungs, liver, kidneys, pancreas, and intestines. Tissues include corneas, skin, bone, tendons, and heart valves.",
+    },
+    {
+      id: "organ-8",
+      question: "How many lives can one organ donor save?",
+      answer:
+        "One organ donor can save up to 8 lives through organ donation and enhance the lives of up to 75 people through tissue donation.",
     },
   ],
-  eligibility: [
+  fundraising: [
     {
-      id: "eligibility-1",
-      question: "Who can donate blood?",
+      id: "fundraising-1",
+      question: "What is Zeffy?",
       answer:
-        "Basic eligibility includes: At least 17 years old (16 with parental consent in some states), weigh at least 110 pounds, be in good general health, and feel well on donation day.",
+        "Zeffy is a 100% free fundraising platform for nonprofits, covering all transaction fees through voluntary contributions from donors. It's designed to help organizations raise funds without any platform fees.",
     },
     {
-      id: "eligibility-2",
-      question: "Can I donate if I have a medical condition?",
+      id: "fundraising-2",
+      question: "How does Zeffy remain free for nonprofits?",
       answer:
-        "It depends on the condition. Many people with managed conditions like diabetes or high blood pressure can still donate. Our medical staff will determine your eligibility during the screening process.",
+        "Zeffy relies entirely on optional contributions from donors to cover operational costs, ensuring nonprofits receive 100% of the funds raised. Donors can choose to add a small contribution to support Zeffy's free services.",
     },
     {
-      id: "eligibility-3",
-      question: "Can I donate if I'm taking medication?",
+      id: "fundraising-3",
+      question: "What fundraising tools does Zeffy offer?",
       answer:
-        "Many medications do not prevent blood donation. However, some may require a waiting period. During screening, you'll be asked about medications, and a healthcare professional will determine your eligibility.",
+        "Zeffy provides tools for donations, event ticketing, peer-to-peer campaigns, memberships, online shops, raffles, auctions, and donor management. It's a comprehensive platform for all your fundraising needs.",
     },
     {
-      id: "eligibility-4",
-      question: "Can I donate if I've traveled recently?",
+      id: "fundraising-4",
+      question: "How can I communicate Zeffy's model to my donors?",
       answer:
-        "Travel to certain countries may require a waiting period before you can donate, depending on disease risks in those areas. Our staff will review your travel history during the screening process.",
+        "Inform donors that Zeffy allows 100% of their donation to support your mission, with optional contributions supporting Zeffy's free services. This transparency helps donors understand exactly where their money goes.",
     },
     {
-      id: "eligibility-5",
-      question: "Can I donate if I'm pregnant or breastfeeding?",
+      id: "fundraising-5",
+      question: "Where can I find more information or assistance with Zeffy?",
       answer:
-        "Pregnant women cannot donate blood. Breastfeeding mothers can donate after 6 weeks postpartum, provided they meet all other eligibility requirements and feel well.",
+        "Visit Zeffy's Help Center for comprehensive guides and support. They offer detailed documentation, tutorials, and customer support to help you get started with fundraising.",
     },
     {
-      id: "eligibility-6",
-      question: "Is there an upper age limit for blood donation?",
+      id: "fundraising-6",
+      question: "Can I track my fundraising progress on Zeffy?",
       answer:
-        "There's no upper age limit for blood donation as long as you're healthy and meet all other eligibility requirements. Donors over 65 may need additional medical clearance.",
-    },
-  ],
-  process: [
-    {
-      id: "process-1",
-      question: "What should I bring to my donation appointment?",
-      answer:
-        "Please bring a valid photo ID (driver's license, passport, etc.) and your donor card if you have one. We also recommend bringing a list of current medications and wearing comfortable clothing.",
+        "Yes, Zeffy provides comprehensive donor management and tracking tools. You can monitor your fundraising progress, donor engagement, and campaign performance in real-time.",
     },
     {
-      id: "process-2",
-      question: "Will donating blood hurt?",
+      id: "fundraising-7",
+      question: "Is there a minimum amount I need to raise to use Zeffy?",
       answer:
-        "You may feel a brief pinch when the needle is inserted, similar to getting a vaccination. Most donors report minimal discomfort during the actual donation process.",
+        "No, there's no minimum fundraising amount required to use Zeffy. Whether you're raising $100 or $100,000, the platform is free to use for all nonprofits.",
     },
     {
-      id: "process-3",
-      question: "Can I donate if I have a fear of needles?",
+      id: "fundraising-8",
+      question: "How quickly can I start fundraising with Zeffy?",
       answer:
-        "Many people with needle anxiety successfully donate blood. Our staff provides relaxation techniques, distraction methods, and extra support to help nervous donors feel comfortable.",
-    },
-    {
-      id: "process-4",
-      question: "What should I do before donating blood?",
-      answer:
-        "Eat a healthy meal, drink plenty of water, get a good night's sleep, and avoid alcohol for 24 hours before donation. Bring your ID and wear comfortable clothing with sleeves that can be rolled up.",
-    },
-    {
-      id: "process-5",
-      question: "What should I do after donating blood?",
-      answer:
-        "Rest for 15 minutes, drink plenty of fluids, avoid heavy lifting for 24 hours, and eat iron-rich foods. If you feel dizzy or unwell, contact us immediately.",
-    },
-  ],
-  safety: [
-    {
-      id: "safety-1",
-      question: "How is my donated blood tested?",
-      answer:
-        "Every unit undergoes comprehensive testing for infectious diseases (HIV, Hepatitis B & C, Syphilis, West Nile Virus) and blood typing (ABO group, Rh factor, antibody screening).",
-    },
-    {
-      id: "safety-2",
-      question: "What happens if my blood tests positive for something?",
-      answer:
-        "If any test results are positive, your blood will not be used for transfusion and you will be notified confidentially. We provide counseling and referral services for appropriate medical care.",
-    },
-    {
-      id: "safety-3",
-      question: "Are there any side effects from donating blood?",
-      answer:
-        "Most people experience no side effects. Some may have slight fatigue, mild thirst, or temporary lightheadedness. Rare side effects include bruising at the needle site, fainting, or nausea.",
-    },
-    {
-      id: "safety-4",
-      question: "How do you ensure the safety of the blood supply?",
-      answer:
-        "We follow strict FDA guidelines, use sterile single-use equipment, conduct thorough donor screening, perform comprehensive testing, and maintain proper storage and handling procedures.",
+        "You can start fundraising immediately after signing up. The platform is designed for quick setup, allowing you to create campaigns and start accepting donations right away.",
     },
   ],
 }
 
 const categories = [
   {
-    id: "general",
-    title: "General",
-    count: faqData.general.length,
+    id: "blood",
+    title: "Blood Donation",
+    count: faqData.blood.length,
     color: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
     icon: Heart,
   },
   {
-    id: "eligibility",
-    title: "Eligibility",
-    count: faqData.eligibility.length,
+    id: "organ",
+    title: "Organ Donation",
+    count: faqData.organ.length,
     color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
-    icon: Users,
+    icon: Gift,
   },
   {
-    id: "process",
-    title: "Process",
-    count: faqData.process.length,
+    id: "fundraising",
+    title: "Fundraising",
+    count: faqData.fundraising.length,
     color:
       "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800",
-    icon: Clock,
-  },
-  {
-    id: "safety",
-    title: "Safety",
-    count: faqData.safety.length,
-    color:
-      "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
-    icon: Shield,
+    icon: DollarSign,
   },
 ]
 
 export default function FAQsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("general")
+  const [selectedCategory, setSelectedCategory] = useState<string>("blood")
 
-  const currentQuestions = faqData[selectedCategory as keyof typeof faqData] || faqData.general
+  const currentQuestions = faqData[selectedCategory as keyof typeof faqData] || faqData.blood
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -216,7 +212,7 @@ export default function FAQsPage() {
                 Frequently Asked Questions
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Find answers to common questions about blood donation, eligibility, and the donation process.
+                Find answers to common questions about blood donation, organ donation, and fundraising with Zeffy.
               </p>
             </div>
           </div>
@@ -253,7 +249,7 @@ export default function FAQsPage() {
             </div>
 
             {/* Category Selection */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 md:mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 md:mb-12">
               {categories.map((category) => (
                 <Card
                   key={category.id}
@@ -268,13 +264,11 @@ export default function FAQsPage() {
                     <category.icon
                       className={`h-6 w-6 md:h-8 md:w-8 mx-auto mb-3 ${
                         selectedCategory === category.id
-                          ? category.id === "general"
+                          ? category.id === "blood"
                             ? "text-red-600 dark:text-red-400"
-                            : category.id === "eligibility"
+                            : category.id === "organ"
                               ? "text-blue-600 dark:text-blue-400"
-                              : category.id === "process"
-                                ? "text-green-600 dark:text-green-400"
-                                : "text-orange-600 dark:text-orange-400"
+                              : "text-green-600 dark:text-green-400"
                           : "text-muted-foreground"
                       }`}
                     />
@@ -301,24 +295,20 @@ export default function FAQsPage() {
                     <>
                       <div
                         className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          selectedCategory === "general"
+                          selectedCategory === "blood"
                             ? "bg-red-100 dark:bg-red-900/30"
-                            : selectedCategory === "eligibility"
+                            : selectedCategory === "organ"
                               ? "bg-blue-100 dark:bg-blue-900/30"
-                              : selectedCategory === "process"
-                                ? "bg-green-100 dark:bg-green-900/30"
-                                : "bg-orange-100 dark:bg-orange-900/30"
+                              : "bg-green-100 dark:bg-green-900/30"
                         }`}
                       >
                         <IconComponent
                           className={`h-4 w-4 ${
-                            selectedCategory === "general"
+                            selectedCategory === "blood"
                               ? "text-red-600 dark:text-red-400"
-                              : selectedCategory === "eligibility"
+                              : selectedCategory === "organ"
                                 ? "text-blue-600 dark:text-blue-400"
-                                : selectedCategory === "process"
-                                  ? "text-green-600 dark:text-green-400"
-                                  : "text-orange-600 dark:text-orange-400"
+                                : "text-green-600 dark:text-green-400"
                           }`}
                         />
                       </div>
@@ -374,7 +364,7 @@ export default function FAQsPage() {
               >
                 <Link href="/donate">
                   <Heart className="h-4 w-4 mr-2" />
-                  Donate Blood Now
+                  Donate Now
                 </Link>
               </Button>
             </div>

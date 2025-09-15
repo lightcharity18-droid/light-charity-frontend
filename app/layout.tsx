@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Light Charity",
-  description: "Be a Light. Donate Blood, \nSave Lives.",
+  description: "Be a Light. Donate, \nSave Lives.",
   icons: {
     icon: [
       { url: '/images/light-charity-logo-new.png' },

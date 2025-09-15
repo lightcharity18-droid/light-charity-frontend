@@ -270,8 +270,11 @@ export default function CommunityPage() {
   }, [userMembership.isMember, communityId])
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    // Only scroll for new messages, not initial load
+    if (messages.length > 0) {
+      scrollToBottom()
+    }
+  }, [messages.length])
 
   const fetchCommunity = async () => {
     try {
@@ -339,7 +342,10 @@ export default function CommunityPage() {
         return
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages`, {
+      // Always get recent messages for faster loading
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&limit=50`;
+
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -356,6 +362,13 @@ export default function CommunityPage() {
           setMessages(newMessages)
           if (newMessages.length > 0) {
             setLastMessageId(newMessages[newMessages.length - 1]._id)
+          }
+          
+          // For initial load, scroll instantly to bottom
+          if (isInitialLoad && newMessages.length > 0) {
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: "instant" })
+            }, 50)
           }
         }
       }
@@ -490,11 +503,11 @@ export default function CommunityPage() {
     }
   }
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (smooth = true) => {
     // Use a small timeout to ensure DOM has updated before scrolling
     setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, 100)
+      messagesEndRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "instant" })
+    }, smooth ? 100 : 50)
   }
 
   const formatTime = (dateString: string) => {

@@ -132,7 +132,7 @@ export default function Home() {
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
                   Be a Light. <br />
                   <span className="bg-gradient-to-r from-orange-600 to-red-600 dark:from-orange-400 dark:to-red-400 bg-clip-text text-transparent leading-[1.3] inline-block">
-                    Donate Blood, <br /> Save Lives.
+                    Donate, <br /> Save Lives.
                   </span>
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-md leading-relaxed">
@@ -142,16 +142,40 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300"
-                  asChild
-                >
-                  <Link href="/donate">
-                    <Heart className="h-5 w-5 mr-2" />
-                    Become a Donor
-                  </Link>
-                </Button>
+                <div className="flex flex-col gap-3">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300"
+                    asChild
+                  >
+                    <Link href="/donate">
+                      <Heart className="h-5 w-5 mr-2" />
+                      Become a Blood Donor
+                    </Link>
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
+                    asChild
+                  >
+                    <Link href="/organ-donation">
+                      <Heart className="h-5 w-5 mr-2" />
+                      Become an Organ Donor
+                    </Link>
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
+                    asChild
+                  >
+                    <Link href="/fundraising">
+                      <TrendingUp className="h-5 w-5 mr-2" />
+                      Start Fundraising
+                    </Link>
+                  </Button>
+                </div>
                 <Button
                   size="lg"
                   variant="outline"
@@ -608,7 +632,7 @@ export default function Home() {
                 <span className="text-xl font-bold">Light Charity</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Be a Light. Donate Blood, <br /> Save Lives. Together, we're building a healthier, more caring community.
+                Be a Light. Donate, <br /> Save Lives. Together, we're building a healthier, more caring community.
               </p>
               <div className="flex space-x-4">
                 <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer">
