@@ -342,8 +342,8 @@ export default function CommunityPage() {
         return
       }
 
-      // Always get recent messages for faster loading
-      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&limit=50`;
+      // Load all messages for the community
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&loadAll=true`;
 
       const response = await fetch(url, {
         headers: {

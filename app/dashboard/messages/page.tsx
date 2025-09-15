@@ -148,8 +148,8 @@ export default function MessagesPage() {
       const token = authService.getToken();
       if (!token || !authService.isAuthenticated()) return;
 
-      // Load recent messages first (for initial load)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&limit=50`, {
+      // Load all messages for the community
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&loadAll=true`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -162,7 +162,8 @@ export default function MessagesPage() {
         
         // Reset pagination state for new community
         setCurrentPage(1);
-        setHasMoreMessages(newMessages.length === 50); // If we got 50 messages, there might be more
+        // Check if there are more messages to load (for large communities)
+        setHasMoreMessages(data.data.pagination?.hasMoreMessages || false);
       }
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -222,8 +223,8 @@ export default function MessagesPage() {
       const token = authService.getToken();
       if (!token || !authService.isAuthenticated()) return;
 
-      // Preload messages without updating state
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&limit=50`, {
+      // Preload all messages without updating state
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/api/communities/${communityId}/messages?loadRecent=true&loadAll=true`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -234,7 +235,7 @@ export default function MessagesPage() {
     }
   }, [selectedCommunity, loadingMessages]);
 
-  // Infinite scroll for loading older messages
+  // Infinite scroll for loading older messages (disabled when all messages are loaded)
   const infiniteScrollRef = useInfiniteScroll(loadOlderMessages, {
     hasMore: hasMoreMessages,
     loading: loadingOlderMessages,
@@ -558,8 +559,8 @@ export default function MessagesPage() {
             {/* Messages */}
             <ScrollArea className={`flex-1 ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="space-y-4 transition-opacity duration-200 ease-in-out">
-                {/* Infinite scroll trigger for loading older messages */}
-                <div ref={infiniteScrollRef} className="h-1" />
+                {/* Infinite scroll trigger for loading older messages (only show if there are more messages) */}
+                {hasMoreMessages && <div ref={infiniteScrollRef} className="h-1" />}
                 
                 {/* Loading indicator for older messages */}
                 {loadingOlderMessages && (
