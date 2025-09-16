@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,11 +10,34 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Heart, Search, Filter, Download, Calendar, MapPin, MoreHorizontal } from "lucide-react"
 import { Skeleton } from "@/components/ui/loading"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function DonationsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [donations, setDonations] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState("")
+  const { user } = useAuth()
+  const router = useRouter()
+
+  // Check if user is a hospital - redirect if not
+  useEffect(() => {
+    if (user && user.userType !== 'hospital') {
+      router.push('/dashboard')
+    }
+  }, [user, router])
+
+  // Don't render the page if user is not a hospital
+  if (user && user.userType !== 'hospital') {
+    return (
+      <div className="container p-4 md:p-6">
+        <div className="text-center py-12">
+          <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">Access Denied</h3>
+          <p className="text-muted-foreground">This page is only accessible to hospital users.</p>
+        </div>
+      </div>
+    )
+  }
 
   // Simulate loading
   useEffect(() => {

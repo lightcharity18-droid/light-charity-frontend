@@ -9,9 +9,13 @@ import Link from "next/link"
 import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
 import { NavBar } from "@/components/nav-bar"
 import { Badge } from "@/components/ui/badge"
-import { CalendarDays, Clock, Droplet, FileText, Heart, Users, Shield, Award, MapPin, Phone, Mail, TrendingUp, CheckCircle, Star } from "lucide-react"
+import { CalendarDays, Clock, Droplet, FileText, Heart, Users, Shield, Award, MapPin, Phone, Mail, TrendingUp, CheckCircle, Star, ArrowRight } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { motion } from "framer-motion"
+import { fadeInUp, staggerContainer, floating } from "@/lib/animations"
+import { AnimatedCard, FeatureCard, AnimatedButton } from "@/components/ui/animated-card"
+import { EnhancedLoading, SkeletonLoader } from "@/components/ui/enhanced-loading"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'
 
@@ -122,123 +126,217 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-orange-50 via-red-50 to-orange-100 dark:from-orange-950/20 dark:via-red-950/20 dark:to-orange-950/20 py-16 md:py-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-red-500/5 dark:from-orange-400/5 dark:to-red-400/5"></div>
+          
+          {/* Floating background elements */}
+          <motion.div
+            variants={floating}
+            animate="animate"
+            className="absolute top-20 right-20 w-32 h-32 bg-orange-500/10 rounded-full blur-xl"
+          />
+          <motion.div
+            variants={floating}
+            animate="animate"
+            transition={{ delay: 1, duration: 6 }}
+            className="absolute bottom-20 left-20 w-24 h-24 bg-red-500/10 rounded-full blur-xl"
+          />
+          
           <div className="container relative grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-4">
+            <motion.div 
+              className="space-y-8"
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+            >
+              <motion.div className="space-y-4" variants={fadeInUp}>
+                <motion.div variants={fadeInUp}>
                 <Badge className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/70 border-orange-200 dark:border-orange-800">
                   <Heart className="h-3 w-3 mr-1" />
                   Saving Lives Together
                 </Badge>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+                </motion.div>
+                <motion.h1 
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground"
+                  variants={fadeInUp}
+                >
                   Be a Light. <br />
                   <span className="bg-gradient-to-r from-orange-600 to-red-600 dark:from-orange-400 dark:to-red-400 bg-clip-text text-transparent leading-[1.3] inline-block">
                     Donate, <br /> Save Lives.
                   </span>
-                </h1>
-                <p className="text-lg text-muted-foreground max-w-md leading-relaxed">
+                </motion.h1>
+                <motion.p 
+                  className="text-lg text-muted-foreground max-w-md leading-relaxed"
+                  variants={fadeInUp}
+                >
                   Join our community of heroes and help save lives. Every donation counts and can help up to three
                   people in need. Your contribution makes a real difference.
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4"
+                variants={fadeInUp}
+              >
                 <div className="flex flex-col gap-3">
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300"
-                    asChild
+                  <AnimatedButton
+                    size="default"
+                    variant="default"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl"
+                    onClick={() => window.location.href = '/donate'}
                   >
-                    <Link href="/donate">
-                      <Heart className="h-5 w-5 mr-2" />
+                      <Heart className="h-4 w-4 mr-2" />
                       Become a Blood Donor
-                    </Link>
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
-                    asChild
+                  </AnimatedButton>
+                  <AnimatedButton
+                    size="default"
+                    variant="default"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl"
+                    onClick={() => window.location.href = '/organ-donation'}
                   >
-                    <Link href="/organ-donation">
-                      <Heart className="h-5 w-5 mr-2" />
+                      <Heart className="h-4 w-4 mr-2" />
                       Become an Organ Donor
-                    </Link>
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
-                    asChild
+                  </AnimatedButton>
+                  <AnimatedButton
+                    size="default"
+                    variant="default"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl"
+                    onClick={() => window.location.href = '/fundraising'}
                   >
-                    <Link href="/fundraising">
-                      <TrendingUp className="h-5 w-5 mr-2" />
+                      <TrendingUp className="h-4 w-4 mr-2" />
                       Start Fundraising
-                    </Link>
-                  </Button>
+                  </AnimatedButton>
                 </div>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
-                  asChild
+                <AnimatedButton
+                  size="default"
+                  variant="default"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl"
+                  onClick={() => window.location.href = '/about'}
                 >
-                  <Link href="/about">Learn More</Link>
-                </Button>
-              </div>
+                  Learn More
+                </AnimatedButton>
+              </motion.div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-6 pt-8">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
+              <motion.div 
+                className="grid grid-cols-3 gap-6 pt-8"
+                variants={fadeInUp}
+              >
+                <motion.div 
+                  className="text-center"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div 
+                    className="text-2xl font-bold text-orange-600 dark:text-orange-400"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
+                  >
+                    0
+                  </motion.div>
                   <div className="text-sm text-muted-foreground">Lives Saved</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">0</div>
+                </motion.div>
+                <motion.div 
+                  className="text-center"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div 
+                    className="text-2xl font-bold text-red-600 dark:text-red-400"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.7, duration: 0.5, type: "spring" }}
+                  >
+                    0
+                  </motion.div>
                   <div className="text-sm text-muted-foreground">Active Donors</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
+                </motion.div>
+                <motion.div 
+                  className="text-center"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div 
+                    className="text-2xl font-bold text-orange-600 dark:text-orange-400"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.9, duration: 0.5, type: "spring" }}
+                  >
+                    0
+                  </motion.div>
                   <div className="text-sm text-muted-foreground">Centers</div>
-                </div>
-              </div>
-            </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
 
-            <div className="flex justify-center">
+            <motion.div 
+              className="flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+            >
               {/* Conditional rendering based on authentication state */}
               {isAuthenticated ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                >
                 <Card className="w-full max-w-md shadow-2xl border-0 bg-background/80 dark:bg-background/80 backdrop-blur-sm">
                   <CardContent className="pt-8 pb-8 px-8">
-                    <div className="mb-8 text-center">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mb-4">
+                      <motion.div 
+                        className="mb-8 text-center"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                      >
+                        <motion.div 
+                          className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mb-4"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
                         <Heart className="h-8 w-8 text-white" />
-                      </div>
+                        </motion.div>
                       <h2 className="text-2xl font-bold mb-2 text-foreground">Welcome back, {getUserDisplayName()}!</h2>
                       <p className="text-sm text-muted-foreground">Thank you for being a part of our community</p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <Button
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="space-y-4"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                      >
+                        <AnimatedButton
                         size="lg"
                         className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                        asChild
+                          onClick={() => window.location.href = '/dashboard'}
                       >
-                        <Link href="/dashboard">
                           <Heart className="h-5 w-5 mr-2" />
                           Go to Dashboard
-                        </Link>
-                      </Button>
+                        </AnimatedButton>
                       
-                      <Button
+                        <AnimatedButton
                         size="lg"
                         variant="outline"
                         className="w-full border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
-                        asChild
-                      >
-                        <Link href="/donate">Schedule Donation</Link>
-                      </Button>
-                    </div>
+                          onClick={() => window.location.href = '/donate'}
+                        >
+                          Schedule Donation
+                        </AnimatedButton>
+                      </motion.div>
 
-                    <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                      <motion.div 
+                        className="mt-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                      >
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Your Impact:</span>
                         <span className="font-semibold text-orange-600 dark:text-orange-400">
@@ -251,21 +349,52 @@ export default function Home() {
                           {(user?.donationHistory?.length || 0) * 3}
                         </span>
                       </div>
-                    </div>
+                      </motion.div>
                   </CardContent>
                 </Card>
+                </motion.div>
               ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                >
                 <Card className="w-full max-w-md shadow-2xl border-0 bg-background/80 dark:bg-background/80 backdrop-blur-sm">
                   <CardContent className="pt-8 pb-8 px-8">
-                    <div className="mb-8 text-center">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mb-4">
+                      <motion.div 
+                        className="mb-8 text-center"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                      >
+                        <motion.div 
+                          className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mb-4"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
                         <Heart className="h-8 w-8 text-white" />
-                      </div>
+                        </motion.div>
                       <h2 className="text-2xl font-bold mb-2 text-foreground">Join Our Community</h2>
                       <p className="text-sm text-muted-foreground">Sign up to start saving lives and track your impact</p>
-                    </div>
-                    <form className="space-y-6" onSubmit={handleSignIn}>
-                      <div className="space-y-2">
+                      </motion.div>
+                      <motion.form 
+                        className="space-y-6" 
+                        onSubmit={handleSignIn}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                      >
+                        <motion.div 
+                          className="space-y-2"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.4, delay: 0.5 }}
+                        >
                         <Label htmlFor="email" className="text-sm font-medium">
                           Email
                         </Label>
@@ -278,8 +407,14 @@ export default function Home() {
                           className="h-12 border-border focus:border-orange-500 focus:ring-orange-500"
                           required
                         />
-                      </div>
-                      <div className="space-y-2">
+                        </motion.div>
+                        <motion.div 
+                          className="space-y-2"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.4, delay: 0.6 }}
+                        >
                         <div className="flex items-center justify-between">
                           <Label htmlFor="password" className="text-sm font-medium">
                             Password
@@ -298,7 +433,13 @@ export default function Home() {
                           className="h-12 border-border focus:border-orange-500 focus:ring-orange-500"
                           required
                         />
-                      </div>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.4, delay: 0.7 }}
+                        >
                       <Button
                         type="submit"
                         disabled={isLoading || !email || !password}
@@ -306,14 +447,27 @@ export default function Home() {
                       >
                         {isLoading ? 'Signing In...' : 'Sign In'}
                       </Button>
-                      <div className="relative">
+                        </motion.div>
+                        <motion.div 
+                          className="relative"
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.4, delay: 0.8 }}
+                        >
                         <div className="absolute inset-0 flex items-center">
                           <span className="w-full border-t border-border" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
                           <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
                         </div>
-                      </div>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.4, delay: 0.9 }}
+                        >
                       <Button variant="outline" className="w-full h-12 border-border hover:bg-muted">
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                           <path
@@ -336,7 +490,14 @@ export default function Home() {
                         </svg>
                         Sign in with Google
                       </Button>
-                      <div className="text-center text-sm">
+                        </motion.div>
+                        <motion.div 
+                          className="text-center text-sm"
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.5 }}
+                          transition={{ duration: 0.4, delay: 1.0 }}
+                        >
                         Don&apos;t have an account?{" "}
                         <Link
                           href="/signup"
@@ -344,65 +505,110 @@ export default function Home() {
                         >
                           Sign up
                         </Link>
-                      </div>
-                    </form>
+                        </motion.div>
+                      </motion.form>
                   </CardContent>
                 </Card>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Features Section */}
         <section className="py-20 bg-background">
           <div className="container">
-            <div className="text-center mb-16">
+            <motion.div 
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
               <Badge className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/70 border-orange-200 dark:border-orange-800 mb-4">
                 Why Choose Us
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Why Donate Blood?</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              </motion.div>
+              <motion.h2 
+                className="text-3xl md:text-4xl font-bold mb-4 text-foreground"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Why Donate Blood?
+              </motion.h2>
+              <motion.p 
+                className="text-lg text-muted-foreground max-w-2xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 Your blood donation is a gift of life that creates a ripple effect of hope and healing in our community.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
-                <CardContent className="pt-8 pb-8 px-6">
-                  <div className="rounded-full bg-gradient-to-r from-red-500 to-orange-500 p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Heart className="h-8 w-8 text-white" />
+              </motion.p>
+            </motion.div>
+            <div className="grid md:grid-cols-3 gap-8 items-start">
+              {[
+                {
+                  icon: Heart,
+                  title: "Save Lives",
+                  description: "One donation can save up to three lives. Your contribution directly impacts families and communities in need."
+                },
+                {
+                  icon: Shield,
+                  title: "Health Benefits", 
+                  description: "Regular blood donation can help reduce the risk of heart disease and cancer while providing free health screenings."
+                },
+                {
+                  icon: Users,
+                  title: "Community Impact",
+                  description: "Join a community of heroes making a difference in people's lives every day. Together, we save lives."
+                }
+              ].map((feature, i) => (
+                <motion.div
+                  key={feature.title}
+                  className="flex flex-col items-center text-center relative"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ 
+                    opacity: 1, 
+                    y: 0,
+                    transition: {
+                      delay: i * 0.2,
+                      duration: 0.5,
+                      ease: [0.42, 0, 0.58, 1] // Same cubic-bezier as Split-Mate
+                    }
+                  }}
+                  viewport={{ once: true, amount: 0.5 }}
+                >
+                  {/* Icon with connecting arrow */}
+                  <div className="relative flex items-center justify-center mb-6">
+                    <motion.div
+                      className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-xl overflow-hidden p-6 w-full"
+                      whileHover={{ 
+                        y: -8,
+                        transition: { duration: 0.3 }
+                      }}
+                    >
+                      <motion.div
+                        className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
+                        whileHover={{ rotate: 5 }}
+                      >
+                        <feature.icon className="h-8 w-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-xl font-bold mb-3 text-foreground">{feature.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
+                    </motion.div>
+                    
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-foreground">Save Lives</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    One donation can save up to three lives. Your contribution directly impacts families and communities
-                    in need.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
-                <CardContent className="pt-8 pb-8 px-6">
-                  <div className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Shield className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-foreground">Health Benefits</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Regular blood donation can help reduce the risk of heart disease and cancer while providing free
-                    health screenings.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
-                <CardContent className="pt-8 pb-8 px-6">
-                  <div className="rounded-full bg-gradient-to-r from-red-500 to-orange-500 p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Users className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-foreground">Community Impact</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Join a community of heroes making a difference in people's lives every day. Together, we save lives.
-                  </p>
-                </CardContent>
-              </Card>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -410,105 +616,134 @@ export default function Home() {
         {/* New Sections Highlight */}
         <section className="py-20 bg-gradient-to-br from-muted/50 to-orange-50/50 dark:from-muted/20 dark:to-orange-950/20">
           <div className="container">
-            <div className="text-center mb-16">
+            <motion.div 
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
               <Badge className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/70 border-orange-200 dark:border-orange-800 mb-4">
                 Explore Our Resources
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Discover How You Can Help</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              </motion.div>
+              <motion.h2 
+                className="text-3xl md:text-4xl font-bold mb-4 text-foreground"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Discover How You Can Help
+              </motion.h2>
+              <motion.p 
+                className="text-lg text-muted-foreground max-w-2xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 From donating blood to volunteering your time, there are many ways to get involved and make a meaningful
                 impact.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {/* Blog & News Card */}
-              <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
-                <div className="h-48 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center relative overflow-hidden">
+              {[
+                {
+                  icon: FileText,
+                  title: "Blog & News",
+                  badge: "New",
+                  badgeColor: "bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+                  gradient: "from-orange-400 to-red-500",
+                  description: "Stay informed with the latest articles, inspiring stories, and important updates from our community.",
+                  iconInfo: { icon: CalendarDays, text: "Updated weekly" },
+                  buttonText: "Read Latest Articles",
+                  buttonGradient: "from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600",
+                  link: "/blog"
+                },
+                {
+                  icon: Droplet,
+                  title: "Blood Compatibility",
+                  badge: "Interactive",
+                  badgeColor: "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
+                  gradient: "from-red-400 to-orange-500",
+                  description: "Explore our interactive chart to understand blood type compatibility for donations and transfusions.",
+                  iconInfo: { icon: Heart, text: "Find your match" },
+                  buttonText: "View Compatibility Chart",
+                  buttonGradient: "from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600",
+                  link: "/blood-compatibility"
+                },
+                {
+                  icon: Users,
+                  title: "Volunteer With Us",
+                  badge: "Join Us",
+                  badgeColor: "bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+                  gradient: "from-orange-400 to-red-500",
+                  description: "Discover ways to contribute beyond donation. Find volunteer opportunities that match your skills and passion.",
+                  iconInfo: { icon: Clock, text: "Flexible schedules" },
+                  buttonText: "Explore Opportunities",
+                  buttonGradient: "from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600",
+                  link: "/volunteer"
+                }
+              ].map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg rounded-xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ 
+                    opacity: 1, 
+                    y: 0,
+                    transition: {
+                      delay: i * 0.2,
+                      duration: 0.5,
+                      ease: [0.42, 0, 0.58, 1] // Same cubic-bezier as Split-Mate
+                    }
+                  }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  whileHover={{ 
+                    y: -8,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <div className={`h-48 bg-gradient-to-br ${card.gradient} flex items-center justify-center relative overflow-hidden`}>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                  <FileText className="h-16 w-16 text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                    <motion.div
+                      className="h-16 w-16 text-white group-hover:scale-110 transition-transform duration-300 relative z-10"
+                      whileHover={{ rotate: 5 }}
+                    >
+                      <card.icon className="h-16 w-16" />
+                    </motion.div>
                 </div>
                 <CardContent className="p-8">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-foreground">Blog & News</h3>
-                    <Badge className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800">
-                      New
+                      <h3 className="text-xl font-bold text-foreground">{card.title}</h3>
+                      <Badge className={card.badgeColor}>
+                        {card.badge}
                     </Badge>
                   </div>
                   <p className="text-muted-foreground mb-6 leading-relaxed">
-                    Stay informed with the latest articles, inspiring stories, and important updates from our community.
+                      {card.description}
                   </p>
                   <div className="flex items-center text-sm text-muted-foreground mb-6">
-                    <CalendarDays className="h-4 w-4 mr-2" />
-                    <span>Updated weekly</span>
+                      <card.iconInfo.icon className="h-4 w-4 mr-2" />
+                      <span>{card.iconInfo.text}</span>
                   </div>
-                  <Button
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                    asChild
-                  >
-                    <Link href="/blog">Read Latest Articles</Link>
-                  </Button>
+                    <AnimatedButton
+                      className={`w-full bg-gradient-to-r ${card.buttonGradient} text-white`}
+                      onClick={() => window.location.href = card.link}
+                    >
+                      {card.buttonText}
+                    </AnimatedButton>
                 </CardContent>
-              </Card>
-
-              {/* Blood Compatibility Card */}
-              <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
-                <div className="h-48 bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                  <Droplet className="h-16 w-16 text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                </div>
-                <CardContent className="p-8">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-foreground">Blood Compatibility</h3>
-                    <Badge className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
-                      Interactive
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
-                    Explore our interactive chart to understand blood type compatibility for donations and transfusions.
-                  </p>
-                  <div className="flex items-center text-sm text-muted-foreground mb-6">
-                    <Heart className="h-4 w-4 mr-2" />
-                    <span>Find your match</span>
-                  </div>
-                  <Button
-                    className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-                    asChild
-                  >
-                    <Link href="/blood-compatibility">View Compatibility Chart</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Volunteer Opportunities Card */}
-              <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
-                <div className="h-48 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                  <Users className="h-16 w-16 text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                </div>
-                <CardContent className="p-8">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-foreground">Volunteer With Us</h3>
-                    <Badge className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800">
-                      Join Us
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
-                    Discover ways to contribute beyond donation. Find volunteer opportunities that match your skills and
-                    passion.
-                  </p>
-                  <div className="flex items-center text-sm text-muted-foreground mb-6">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span>Flexible schedules</span>
-                  </div>
-                  <Button
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                    asChild
-                  >
-                    <Link href="/volunteer">Explore Opportunities</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -535,21 +770,35 @@ export default function Home() {
             {loadingBlogs ? (
               <div className="grid md:grid-cols-3 gap-8">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className="overflow-hidden border-0 shadow-lg">
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <Card className="overflow-hidden border-0 shadow-lg">
                     <div className="h-48 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
                     <CardContent className="p-6">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-                      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-3"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+                        <SkeletonLoader lines={3} />
                     </CardContent>
                   </Card>
+                  </motion.div>
                 ))}
               </div>
             ) : blogPosts.length > 0 ? (
-              <div className="grid md:grid-cols-3 gap-8">
-                {blogPosts.map((post) => (
-                  <Card key={post._id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+              <motion.div 
+                className="grid md:grid-cols-3 gap-8"
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                {blogPosts.map((post, index) => (
+                  <AnimatedCard
+                    key={post._id}
+                    delay={index * 0.1}
+                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg"
+                  >
                     <div className="h-48 bg-gradient-to-br from-orange-200 to-red-200 dark:from-orange-900/50 dark:to-red-900/50 relative">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                         <Badge className={`${categoryColors[post.category] || 'bg-gray-500 hover:bg-gray-600'} text-white`}>
@@ -565,17 +814,17 @@ export default function Home() {
                       <p className="text-muted-foreground mb-4 leading-relaxed">
                         {getExcerpt(post.content)}
                       </p>
-                      <Button
-                        variant="link"
+                      <AnimatedButton
+                        variant="ghost"
                         className="p-0 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300"
-                        asChild
+                        onClick={() => window.location.href = `/blog/${post._id}`}
                       >
-                        <Link href={`/blog/${post._id}`}>Read More →</Link>
-                      </Button>
+                        Read More →
+                      </AnimatedButton>
                     </CardContent>
-                  </Card>
+                  </AnimatedCard>
                 ))}
-              </div>
+              </motion.div>
             ) : (
               <div className="text-center py-12">
                 <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
@@ -587,157 +836,287 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500 text-white relative overflow-hidden">
+        <section className="py-24 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 text-white relative overflow-hidden">
+          {/* Enhanced background effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 to-red-600/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+          
+          {/* Floating background elements */}
+          <motion.div
+            variants={floating}
+            animate="animate"
+            className="absolute top-10 right-10 w-32 h-32 bg-white/5 rounded-full blur-xl"
+          />
+          <motion.div
+            variants={floating}
+            animate="animate"
+            transition={{ delay: 1, duration: 8 }}
+            className="absolute bottom-10 left-10 w-24 h-24 bg-white/5 rounded-full blur-xl"
+          />
+          
           <div className="container relative text-center">
-            <div className="max-w-3xl mx-auto">
+            <motion.div 
+              className="max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
               <Badge className="bg-white/20 text-white hover:bg-white/30 border-white/20 mb-6">
                 <Award className="h-3 w-3 mr-1" />
                 Join Our Mission
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Save Lives?</h2>
-              <p className="text-xl mb-8 text-orange-100">
+              </motion.div>
+              
+              <motion.h2 
+                className="text-4xl md:text-5xl font-bold mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Ready to Save Lives?
+              </motion.h2>
+              
+              <motion.p 
+                className="text-xl mb-8 text-orange-100"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 Every donation makes a difference. Join thousands of donors who are already making an impact in their
                 communities.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="bg-white text-orange-600 hover:bg-gray-100" asChild>
-                  <Link href="/donate">
+              </motion.p>
+              
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <AnimatedButton
+                  size="lg"
+                  className="bg-white text-orange-600 hover:bg-gray-100 shadow-lg"
+                  onClick={() => window.location.href = '/donate'}
+                >
                     <Heart className="h-5 w-5 mr-2" />
                     Donate Now
-                  </Link>
-                </Button>
-                <Button
+                </AnimatedButton>
+                <AnimatedButton
                   size="lg"
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
-                  asChild
+                  onClick={() => window.location.href = '/volunteer'}
                 >
-                  <Link href="/volunteer">Volunteer With Us</Link>
-                </Button>
-              </div>
-            </div>
+                  Volunteer With Us
+                </AnimatedButton>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       </main>
 
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="container">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="space-y-4">
+      <footer className="relative w-full bg-gradient-to-b from-gray-900 via-gray-800 to-black overflow-hidden py-16">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        
+        {/* Floating background elements */}
+        <motion.div
+          variants={floating}
+          animate="animate"
+          className="absolute top-20 right-20 w-32 h-32 bg-orange-500/5 rounded-full blur-xl"
+        />
+        <motion.div
+          variants={floating}
+          animate="animate"
+          transition={{ delay: 1, duration: 10 }}
+          className="absolute bottom-20 left-20 w-24 h-24 bg-red-500/5 rounded-full blur-xl"
+        />
+
+        <div className="container relative z-10">
+          {/* Main footer content */}
+          <motion.div 
+            className="grid md:grid-cols-4 gap-8 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Brand section */}
+            <motion.div 
+              className="space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                <motion.div 
+                  className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <Heart className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xl font-bold">Light Charity</span>
+                </motion.div>
+                <span className="text-2xl font-bold">Light Charity</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
                 Be a Light. Donate, <br /> Save Lives. Together, we're building a healthier, more caring community.
               </p>
               <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer">
-                  <span className="text-xs">f</span>
+                {[
+                  { icon: "f", label: "Facebook" },
+                  { icon: "t", label: "Twitter" },
+                  { icon: "in", label: "LinkedIn" }
+                ].map((social, index) => (
+                  <motion.div
+                    key={social.label}
+                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer"
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
+                  >
+                    <span className="text-sm font-medium">{social.icon}</span>
+                  </motion.div>
+                ))}
                 </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer">
-                  <span className="text-xs">t</span>
-                </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer">
-                  <span className="text-xs">in</span>
-                </div>
+            </motion.div>
+
+            {/* Quick Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
+                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Quick Links</h3>
               </div>
-            </div>
-
-            <div>
-              <h3 className="font-bold mb-6 text-lg">Quick Links</h3>
               <ul className="space-y-3">
-                <li>
-                  <Link href="/about" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    About Us
+                {[
+                  { name: "About Us", href: "/about" },
+                  { name: "Donation Process", href: "/donation-process" },
+                  { name: "Find Centers", href: "/locations" },
+                  { name: "FAQs", href: "/faqs" },
+                  { name: "Blood Compatibility", href: "/blood-compatibility" }
+                ].map((link, index) => (
+                  <motion.li
+                    key={link.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                  >
+                    <Link 
+                      href={link.href} 
+                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                    >
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">
+                        {link.name}
+                      </span>
                   </Link>
-                </li>
-                <li>
-                  <Link href="/donation-process" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Donation Process
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/locations" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Find Centers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faqs" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    FAQs
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blood-compatibility" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Blood Compatibility
-                  </Link>
-                </li>
+                  </motion.li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
 
-            <div>
-              <h3 className="font-bold mb-6 text-lg">Get Involved</h3>
+            {/* Get Involved */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-1.5 h-4 bg-red-500 rounded-sm"></div>
+                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Get Involved</h3>
+              </div>
               <ul className="space-y-3">
-                <li>
-                  <Link href="/donate" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Donate Blood
+                {[
+                  { name: "Donate Blood", href: "/donate" },
+                  { name: "Organ Donation", href: "/organ-donation" },
+                  { name: "Volunteer", href: "/volunteer" },
+                  { name: "Fundraising", href: "/fundraising" },
+                  { name: "Blog & News", href: "/blog" }
+                ].map((link, index) => (
+                  <motion.li
+                    key={link.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
+                  >
+                    <Link 
+                      href={link.href} 
+                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                    >
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">
+                        {link.name}
+                      </span>
                   </Link>
-                </li>
-                <li>
-                  <Link href="/organ-donation" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Organ Donation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/volunteer" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Volunteer
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/fundraising" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Fundraising
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog" className="text-gray-400 hover:text-orange-400 transition-colors">
-                    Blog & News
-                  </Link>
-                </li>
+                  </motion.li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
 
-            <div>
-              <h3 className="font-bold mb-6 text-lg">Contact Info</h3>
+            {/* Newsletter */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
+                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Stay Connected</h3>
+              </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-orange-400" />
-                  <span className="text-gray-400"></span>
+                  <span className="text-gray-400 text-sm">info@lightcharity.org</span>
                 </div>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="font-medium mb-3">Newsletter</h4>
+                <div>
+                  <h4 className="font-medium mb-3 text-white">Newsletter</h4>
                 <div className="flex gap-2">
                   <Input
                     placeholder="Your email"
-                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500"
+                      className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 text-sm"
                   />
-                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                    <AnimatedButton 
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-sm px-4"
+                    >
                     Subscribe
-                  </Button>
+                    </AnimatedButton>
                 </div>
               </div>
             </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-            <p className="text-gray-400">
+          {/* Footer bottom */}
+          <motion.div 
+            className="border-t border-gray-800 pt-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} Light Charity. All rights reserved. | Privacy Policy | Terms of Service
             </p>
-          </div>
+          </motion.div>
         </div>
       </footer>
 

@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -55,13 +56,16 @@ export function NavBar() {
   const displayUser = user ? {
     ...user,
     name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-    avatar: user.avatar || "/placeholder.svg",
-    donationCount: user.donationCount || 0,
-    badgeLevel: user.badgeLevel || "bronze" as const,
+    avatar: (user as any).avatar || "/placeholder.svg",
+    donationCount: (user as any).donationCount || 0,
+    badgeLevel: (user as any).badgeLevel || "bronze" as const,
   } : null
 
   return (
-    <header
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
       className={cn(
         "sticky top-0 z-50 transition-all duration-300 safe-area-inset",
         isScrolled
@@ -70,87 +74,109 @@ export function NavBar() {
       )}
     >
       <div className="container flex justify-between items-center py-3 md:py-4">
-        <Logo />
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Logo />
+        </motion.div>
 
         {/* Desktop Navigation */}
-         
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-1 hover:text-primary hover:bg-primary/10 focus-visible-ring"
+        <motion.div 
+          className="hidden lg:flex items-center gap-6 xl:gap-8"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-1 hover:text-primary hover:bg-primary/10 focus-visible-ring"
+                >
+                  About
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 animate-scale-in">
+                <DropdownMenuItem asChild>
+                  <Link href="/about" className="flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    About Us
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/donation-process" className="flex items-center">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Donation Process
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/faqs" className="flex items-center">
+                    <Bell className="h-4 w-4 mr-2" />
+                    FAQs
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/blood-compatibility" className="flex items-center">
+                    <Home className="h-4 w-4 mr-2" />
+                    Blood Compatibility
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </motion.div>
+
+          {[
+            { href: "/locations", label: "Find Centers" },
+            { href: "/blog", label: "Blog & News", hasBadge: true },
+            { href: "/volunteer", label: "Volunteer" },
+            { href: "/fundraising", label: "Fundraising" }
+          ].map((item, index) => (
+            <motion.div
+              key={item.href}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+            >
+              <Link
+                href={item.href}
+                className="text-sm font-medium hover:text-primary transition-colors focus-visible-ring rounded-sm px-2 py-1 relative group"
               >
-                
-                About
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 animate-scale-in">
-              <DropdownMenuItem asChild>
-                <Link href="/about" className="flex items-center">
-                  <User className="h-4 w-4 mr-2" />
-                  About Us
-                </Link>
-               
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/donation-process" className="flex items-center">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Donation Process
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/faqs" className="flex items-center">
-                  <Bell className="h-4 w-4 mr-2" />
-                  FAQs
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/blood-compatibility" className="flex items-center">
-                  <Home className="h-4 w-4 mr-2" />
-                  Blood Compatibility
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {item.label}
+                {item.hasBadge && (
+                  <Badge className="absolute -top-2 -right-2 h-2 w-2 p-0 bg-primary dark:bg-orange-400 animate-pulse" />
+                )}
+                <motion.div
+                  className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary"
+                  whileHover={{ width: "100%" }}
+                  transition={{ duration: 0.2 }}
+                />
+              </Link>
+            </motion.div>
+          ))}
 
-          <Link
-            href="/locations"
-            className="text-sm font-medium hover:text-primary transition-colors focus-visible-ring rounded-sm px-2 py-1"
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.9 }}
           >
-            Find Centers
-          </Link>
-
-          <Link
-            href="/blog"
-            className="text-sm font-medium hover:text-primary transition-colors focus-visible-ring rounded-sm px-2 py-1 relative"
-          >
-            Blog & News
-            <Badge className="absolute -top-2 -right-2 h-2 w-2 p-0 bg-primary dark:bg-orange-400 animate-pulse" />
-          </Link>
-
-          <Link
-            href="/volunteer"
-            className="text-sm font-medium hover:text-primary transition-colors focus-visible-ring rounded-sm px-2 py-1"
-          >
-            Volunteer
-          </Link>
-
-          
-                  <Link
-                    href="/fundraising"
-                    className="text-sm font-medium hover:text-primary transition-colors focus-visible-ring rounded-sm px-2 py-1">
-
-                    Fundraising
-                    </Link>
-                
-
-          <ThemeToggle />
+            <ThemeToggle />
+          </motion.div>
 
           {isAuthenticated && displayUser ? (
-            <>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 1.0 }}
+            >
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -173,7 +199,7 @@ export function NavBar() {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">{displayUser.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -202,63 +228,125 @@ export function NavBar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
+            </motion.div>
           ) : (
-            <>
-              <Button
-                variant="outline"
-                className="border-primary/20 hover:bg-primary/10 hover:text-primary focus-visible-ring"
-                asChild
+            <motion.div
+              className="flex items-center gap-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 1.0 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 1.1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-              <Button
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300 focus-visible-ring"
-                asChild
+                <Button
+                  variant="outline"
+                  className="border-primary/20 hover:bg-primary/10 hover:text-primary focus-visible-ring"
+                  asChild
+                >
+                  <Link href="/signup">Sign Up</Link>
+                </Button>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 1.2 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Link href="/login">Sign In</Link>
-              </Button>
-            </>
+                <Button
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300 focus-visible-ring"
+                  asChild
+                >
+                  <Link href="/login">Sign In</Link>
+                </Button>
+              </motion.div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Mobile menu button */}
-        <div className="lg:hidden flex items-center gap-2">
-          <ThemeToggle />
-          {displayUser && (
-            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-              <AvatarImage src={displayUser.avatar || "/placeholder.svg"} alt={displayUser.name} />
-              <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs">
-                {displayUser.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="hover:bg-primary/10 focus-visible-ring touch-manipulation"
+        <motion.div 
+          className="lg:hidden flex items-center gap-2"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
           >
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-        </div>
+            <ThemeToggle />
+          </motion.div>
+          {displayUser && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
+            >
+              <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                <AvatarImage src={displayUser.avatar || "/placeholder.svg"} alt={displayUser.name} />
+                <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs">
+                  {displayUser.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+            </motion.div>
+          )}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.6 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="hover:bg-primary/10 focus-visible-ring touch-manipulation"
+            >
+              <motion.div
+                animate={{ rotate: isMobileMenuOpen ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </motion.div>
+            </Button>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        
-        <div className="lg:hidden bg-background/95 dark:bg-background/95 backdrop-blur-md border-t shadow-lg animate-slide-up">
-          <div className="container py-4 space-y-2 safe-area-inset">
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            className="lg:hidden bg-background/95 dark:bg-background/95 backdrop-blur-md border-t shadow-lg"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <motion.div 
+              className="container py-4 space-y-2 safe-area-inset"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
             {isAuthenticated && displayUser ? (
               <>
                 <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg mb-4">
                   <DonorBadge level={displayUser.badgeLevel} count={displayUser.donationCount} size="sm" />
                   <div>
                     <p className="font-medium text-sm">{displayUser.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
               </>
@@ -331,9 +419,10 @@ export function NavBar() {
                 </button>
               </div>
             )}
-          </div>
-        </div>
-      )}
-    </header>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   )
 }

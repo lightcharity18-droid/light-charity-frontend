@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/protected-route"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { SidebarUser } from "@/components/dashboard/sidebar-user"
 import { MessageProvider } from "@/contexts/message-context"
+import { DashboardNavigation } from "@/components/dashboard/dashboard-navigation"
 
 export default function DashboardLayout({
   children,
@@ -36,91 +37,7 @@ export default function DashboardLayout({
                     <div className="py-4">
                       <Logo />
                     </div>
-                    <nav className="flex-1 py-4">
-                      <ul className="space-y-1">
-                        <li>
-                          <Link
-                            href="/dashboard"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground"
-                          >
-                            <Home className="h-4 w-4" />
-                            Dashboard
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard/donors"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <Users className="h-4 w-4" />
-                            Donors
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/donate"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <Droplet className="h-4 w-4" />
-                            Donate Blood
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard/donations"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <Calendar className="h-4 w-4" />
-                            Donations
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/locations"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <MapPin className="h-4 w-4" />
-                            Locations
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard/communities"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <MessageCircle className="h-4 w-4" />
-                            Communities
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard/messages"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <Mail className="h-4 w-4" />
-                            Messages
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard/blog/create"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <PenTool className="h-4 w-4" />
-                            Create Blog
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard/settings"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                          >
-                            <Settings className="h-4 w-4" />
-                            Settings
-                          </Link>
-                        </li>
-                      </ul>
-                    </nav>
+                    <DashboardNavigation isMobile={true} />
                   </div>
                 </SheetContent>
               </Sheet>
@@ -132,91 +49,7 @@ export default function DashboardLayout({
 
       <div className="flex flex-1">
         <aside className="hidden md:flex w-64 flex-col border-r bg-card">
-          <nav className="flex-1 py-4">
-            <ul className="space-y-1 px-2">
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground"
-                >
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard/donors"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <Users className="h-4 w-4" />
-                  Donors
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/donate"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <Droplet className="h-4 w-4" />
-                  Donate Blood
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard/donations"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <Calendar className="h-4 w-4" />
-                  Donations
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/locations"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <MapPin className="h-4 w-4" />
-                  Locations
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard/communities"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Communities
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard/messages"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <Mail className="h-4 w-4" />
-                  Messages
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard/blog/create"
-                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                >
-                  <PenTool className="h-4 w-4" />
-                  Create Blog
-                </Link>
-              </li>
-                                    <li>
-                        <Link
-                          href="/dashboard/settings"
-                          className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                        >
-                          <Settings className="h-4 w-4" />
-                          Settings
-                        </Link>
-                      </li>
-            </ul>
-          </nav>
+          <DashboardNavigation />
           <SidebarUser />
         </aside>
 
