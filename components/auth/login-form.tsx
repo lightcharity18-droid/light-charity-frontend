@@ -92,17 +92,9 @@ export function LoginForm() {
       googleButtonRef.current.innerHTML = '';
 
       try {
-        // Disable any existing auto-select behavior
-        if (window.google.accounts.id.disableAutoSelect) {
-          window.google.accounts.id.disableAutoSelect();
-        }
-
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleCallback,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-          use_fedcm_for_prompt: false,
         });
 
         window.google.accounts.id.renderButton(googleButtonRef.current, {
@@ -110,6 +102,7 @@ export function LoginForm() {
           size: 'large',
           text: 'signin_with',
           shape: 'rectangular',
+          width: 400,
         });
       } catch (error) {
         console.error('Error rendering Google button:', error);
@@ -240,7 +233,7 @@ export function LoginForm() {
             {/* Google Sign-In Button Container */}
             <div 
               ref={googleButtonRef} 
-              className="w-full [&>div]:w-full [&>div>div]:w-full [&>div>div>iframe]:w-full [&>div>div>iframe]:min-h-[40px] [&>div>div>iframe]:border [&>div>div>iframe]:border-input [&>div>div>iframe]:rounded-md [&>div>div>iframe]:bg-background"
+              className="w-full flex justify-center [&>div]:w-full [&>div>div]:w-full [&>div>div]:flex [&>div>div]:justify-center [&>div>div>iframe]:!w-full [&>div>div>iframe]:!max-w-none [&>div>div>iframe]:!h-10 [&>div>div>iframe]:!min-h-[40px] [&>div>div>iframe]:!box-border"
             ></div>
           </form>
         </CardContent>
