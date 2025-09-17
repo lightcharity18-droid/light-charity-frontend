@@ -112,6 +112,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Handle specific error messages
       if (error.message.includes('already exists')) {
         errorMessage = 'An account with this email already exists.'
+      } else if (error.message.includes('Validation failed')) {
+        errorMessage = 'Please check your input and try again.'
+      } else if (error.message.includes('Password must contain')) {
+        errorMessage = 'Password must contain at least one uppercase letter, one lowercase letter, and one number.'
+      } else if (error.message.includes('must be at least 16 years old')) {
+        errorMessage = 'You must be at least 16 years old to register.'
+      } else if (error.message.includes('valid phone number')) {
+        errorMessage = 'Please provide a valid phone number.'
+      } else if (error.message.includes('valid email')) {
+        errorMessage = 'Please provide a valid email address.'
       }
       
       toast({

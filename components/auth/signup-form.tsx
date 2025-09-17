@@ -44,11 +44,97 @@ export function SignupForm() {
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const [activeTab, setActiveTab] = useState("donor")
 
+  const validatePassword = (password: string) => {
+    if (password.length < 6) {
+      return "Password must be at least 6 characters long"
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      return "Password must contain at least one lowercase letter"
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      return "Password must contain at least one uppercase letter"
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      return "Password must contain at least one number"
+    }
+    return null
+  }
+
   const handleDonorSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Validate required fields
+    if (!donorData.firstName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "First name is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!donorData.lastName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Last name is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!donorData.email.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Email is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!donorData.phone.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Phone number is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!donorData.dateOfBirth) {
+      toast({
+        title: "Validation Error",
+        description: "Date of birth is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!donorData.postalCode.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Postal code is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate password
+    const passwordError = validatePassword(donorData.password)
+    if (passwordError) {
+      toast({
+        title: "Password Error",
+        description: passwordError,
+        variant: "destructive",
+      })
+      return
+    }
+
     if (donorData.password !== donorData.confirmPassword) {
-      alert("Passwords do not match")
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match",
+        variant: "destructive",
+      })
       return
     }
 
@@ -72,8 +158,69 @@ export function SignupForm() {
   const handleHospitalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Validate required fields
+    if (!hospitalData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Hospital/Blood Bank name is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!hospitalData.email.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Email is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!hospitalData.phone.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Phone number is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!hospitalData.address.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Address is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!hospitalData.postalCode.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Postal code is required",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate password
+    const passwordError = validatePassword(hospitalData.password)
+    if (passwordError) {
+      toast({
+        title: "Password Error",
+        description: passwordError,
+        variant: "destructive",
+      })
+      return
+    }
+
     if (hospitalData.password !== hospitalData.confirmPassword) {
-      alert("Passwords do not match")
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match",
+        variant: "destructive",
+      })
       return
     }
 
@@ -152,7 +299,6 @@ export function SignupForm() {
           theme: 'outline',
           size: 'large',
           text: 'signup_with',
-          width: '100%',
           shape: 'rectangular',
         });
         
@@ -189,7 +335,7 @@ export function SignupForm() {
         
         // Redirect based on user status - don't use router.push, use window.location
         // This ensures a full page reload and proper auth state initialization
-        if (data.isNewUser || data.requiresCompletion) {
+        if (data.data?.isNewUser || data.data?.requiresCompletion) {
           // New Google users or users with incomplete profiles need to complete their info
           window.location.href = '/profile?complete=true&source=google';
         } else {

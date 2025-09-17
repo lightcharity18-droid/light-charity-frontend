@@ -11,6 +11,7 @@ export interface User {
   postalCode: string
   isActive: boolean
   isEmailVerified: boolean
+  authProvider?: 'local' | 'google' | 'mixed'
   bloodType?: string
   donationHistory?: Array<{
     date: string
@@ -62,6 +63,8 @@ export interface AuthResponse {
     user: User
     token: string
     refreshToken: string
+    isNewUser?: boolean
+    requiresCompletion?: boolean
   }
   errors?: Array<{ msg: string; param: string }>
 }
@@ -150,7 +153,7 @@ class AuthService {
     }
   }
 
-  async googleAuth(googleData: GoogleAuthData): Promise<AuthResponse & { isNewUser?: boolean }> {
+  async googleAuth(googleData: GoogleAuthData): Promise<AuthResponse> {
     try {
       const response = await this.makeRequest('/auth/google', {
         method: 'POST',
@@ -188,7 +191,7 @@ class AuthService {
     }
   }
 
-  async changePassword(passwordData: { currentPassword: string; newPassword: string }): Promise<void> {
+  async changePassword(passwordData: { currentPassword?: string; newPassword: string }): Promise<void> {
     try {
       await this.makeRequest('/auth/change-password', {
         method: 'PUT',

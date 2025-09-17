@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -167,18 +168,37 @@ export default function SettingsPage() {
       return
     }
 
+    // For Google OAuth users without a password, current password should be empty
+    const hasPassword = user && user.authProvider !== 'google'
+    if (hasPassword && !passwordData.currentPassword) {
+      toast({
+        title: "Current password required",
+        description: "Please enter your current password.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsLoading(true)
 
     try {
       // Call the actual backend API to change password
-      await authService.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-      })
+      const passwordPayload = hasPassword 
+        ? {
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+          }
+        : {
+            newPassword: passwordData.newPassword,
+          }
+      
+      await authService.changePassword(passwordPayload)
       
       toast({
-        title: "Password updated",
-        description: "Your password has been changed successfully.",
+        title: hasPassword ? "Password updated" : "Password set",
+        description: hasPassword 
+          ? "Your password has been changed successfully."
+          : "Your password has been set successfully. You can now login with email and password.",
       })
       
       // Clear password fields
@@ -367,46 +387,53 @@ export default function SettingsPage() {
           <TabsContent value="security" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Change Password</CardTitle>
+                <CardTitle>
+                  {user?.authProvider === 'google' ? 'Set Password' : 'Change Password'}
+                </CardTitle>
                 <CardDescription>
-                  Update your password to keep your account secure.
+                  {user?.authProvider === 'google' 
+                    ? 'Add a password to your account so you can also login with email and password.'
+                    : 'Update your password to keep your account secure.'
+                  }
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handlePasswordChange} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                      disabled={isLoading}
-                    />
-                  </div>
+                  {user?.authProvider !== 'google' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">Current Password</Label>
+                      <PasswordInput
+                        id="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                        disabled={isLoading}
+                        required
+                      />
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New Password</Label>
-                    <Input
+                    <PasswordInput
                       id="newPassword"
-                      type="password"
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                       disabled={isLoading}
+                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <Input
+                    <PasswordInput
                       id="confirmPassword"
-                      type="password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                       disabled={isLoading}
+                      required
                     />
                   </div>
                   <Button type="submit" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Update Password
+                    {user?.authProvider === 'google' ? 'Set Password' : 'Update Password'}
                   </Button>
                 </form>
               </CardContent>

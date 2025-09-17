@@ -123,7 +123,6 @@ export default function Home() {
           theme: 'outline',
           size: 'large',
           text: 'signin_with',
-          width: '100%',
           shape: 'rectangular',
         });
         
@@ -217,7 +216,7 @@ export default function Home() {
       if (data.success) {
         // Redirect based on user status - use window.location for full page reload
         // This ensures proper auth state initialization
-        if (data.isNewUser || data.requiresCompletion) {
+        if (data.data?.isNewUser || data.data?.requiresCompletion) {
           // New Google users or users with incomplete profiles need to complete their info
           window.location.href = '/profile?complete=true&source=google';
         } else {

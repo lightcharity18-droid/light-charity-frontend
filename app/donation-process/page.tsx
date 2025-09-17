@@ -657,8 +657,8 @@ export default function DonationProcessPage() {
                             viewport={{ once: true, amount: 0.5 }}
                             transition={{ duration: 0.3, delay: 0.5 + index * 0.2 + tipIndex * 0.1 }}
                           >
-                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{tip}</span>
+                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{tip}</span>
                           </motion.li>
                       ))}
                     </ul>
