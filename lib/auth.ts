@@ -43,6 +43,18 @@ export interface SignupData {
   hospitalType?: string
 }
 
+export interface GoogleAuthData {
+  googleToken: string
+  userType: 'donor' | 'hospital'
+  additionalData?: {
+    phone?: string
+    postalCode?: string
+    dateOfBirth?: string
+    address?: string
+    hospitalType?: string
+  }
+}
+
 export interface AuthResponse {
   success: boolean
   message: string
@@ -125,6 +137,24 @@ class AuthService {
       const response = await this.makeRequest('/auth/signup', {
         method: 'POST',
         body: JSON.stringify(signupData),
+      })
+
+      if (response.success && response.data) {
+        this.setTokens(response.data.token, response.data.refreshToken)
+        this.setCurrentUser(response.data.user)
+      }
+
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async googleAuth(googleData: GoogleAuthData): Promise<AuthResponse & { isNewUser?: boolean }> {
+    try {
+      const response = await this.makeRequest('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify(googleData),
       })
 
       if (response.success && response.data) {

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
@@ -11,6 +11,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 
 export function SignupForm() {
@@ -37,6 +39,10 @@ export function SignupForm() {
   })
 
   const { signup, isLoading } = useAuth()
+  const router = useRouter()
+  const { toast } = useToast()
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+  const [activeTab, setActiveTab] = useState("donor")
 
   const handleDonorSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,6 +92,122 @@ export function SignupForm() {
     }
   }
 
+  // Load Google Identity Services script and render button
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        // Add a small delay to ensure the button container is ready
+        setTimeout(initializeGoogleSignIn, 100);
+      };
+      
+      // Check if script already exists
+      const existingScript = document.getElementById('google-identity-script');
+      if (existingScript) {
+        // If script exists but Google isn't loaded yet, wait for it
+        if (typeof window.google === 'undefined') {
+          existingScript.onload = () => setTimeout(initializeGoogleSignIn, 100);
+        } else {
+          // Google is already loaded, initialize immediately
+          setTimeout(initializeGoogleSignIn, 100);
+        }
+        return;
+      }
+      
+      script.id = 'google-identity-script';
+      document.head.appendChild(script);
+    };
+
+    const initializeGoogleSignIn = () => {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      
+      if (!clientId) {
+        console.error('Google Client ID not configured');
+        return;
+      }
+
+      if (typeof window.google === 'undefined') {
+        console.error('Google Identity Services not loaded');
+        return;
+      }
+
+      if (!googleButtonRef.current) {
+        console.error('Google button container not found');
+        return;
+      }
+
+      // Clear any existing button content
+      googleButtonRef.current.innerHTML = '';
+
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCallback,
+        });
+
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signup_with',
+          width: '100%',
+          shape: 'rectangular',
+        });
+        
+        console.log('Google Sign-Up button rendered successfully');
+      } catch (error) {
+        console.error('Error rendering Google button:', error);
+      }
+    };
+
+    // Delay the script loading to ensure component is fully mounted
+    const timer = setTimeout(loadGoogleScript, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+
+  const handleGoogleCallback = async (response: any) => {
+    try {
+      if (!response.credential) {
+        throw new Error('No credential received from Google');
+      }
+
+      // Use auth service for Google authentication
+      const { authService } = await import('@/lib/auth');
+      
+      const data = await authService.googleAuth({
+        googleToken: response.credential,
+        userType: activeTab as 'donor' | 'hospital',
+      });
+
+      if (data.success) {
+        // Don't show toast here - let the page redirect handle the user experience
+        // The auth context will handle setting the user state when we navigate
+        
+        // Redirect based on user status - don't use router.push, use window.location
+        // This ensures a full page reload and proper auth state initialization
+        if (data.isNewUser || data.requiresCompletion) {
+          // New Google users or users with incomplete profiles need to complete their info
+          window.location.href = '/profile?complete=true&source=google';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      } else {
+        throw new Error(data.message || 'Google authentication failed');
+      }
+    } catch (error: any) {
+      console.error('Google callback error:', error);
+      toast({
+        title: "Registration failed",
+        description: error.message || "Google authentication failed. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="w-full max-w-md shadow-soft">
       <CardHeader>
@@ -93,11 +215,31 @@ export function SignupForm() {
         <CardDescription className="text-center">Sign up to start donating or managing blood donations</CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="donor" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="donor">Donor</TabsTrigger>
             <TabsTrigger value="hospital">Hospital/Blood Bank</TabsTrigger>
           </TabsList>
+          
+          {/* Google Sign-In Button - appears before form content */}
+          <div className="mb-6">
+            {/* Google Sign-In Button Container */}
+            <div 
+              ref={googleButtonRef} 
+              className="w-full mb-2 [&>div]:w-full [&>div>div]:w-full [&>div>div>iframe]:w-full [&>div>div>iframe]:min-h-[40px] [&>div>div>iframe]:border [&>div>div>iframe]:border-input [&>div>div>iframe]:rounded-md [&>div>div>iframe]:bg-background"
+            ></div>
+            <p className="text-xs text-center text-muted-foreground">
+              Sign up with Google as {activeTab === 'donor' ? 'Donor' : 'Hospital/Blood Bank'}
+            </p>
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or continue with email</span>
+              </div>
+            </div>
+          </div>
           <TabsContent value="donor">
             <form onSubmit={handleDonorSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

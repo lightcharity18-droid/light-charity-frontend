@@ -149,9 +149,36 @@ export default function DashboardPage() {
               <Activity className="h-3 w-3 mr-1" />
               System Healthy
             </Badge>
-            <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+            <Button 
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+              onClick={async () => {
+                const websiteUrl = window.location.origin;
+                try {
+                  if (navigator.share) {
+                    await navigator.share({
+                      title: 'Light Charity Foundation - Save Lives',
+                      text: 'Join our community of heroes and help save lives. Every donation counts!',
+                      url: websiteUrl,
+                    });
+                  } else {
+                    await navigator.clipboard.writeText(websiteUrl);
+                    // You might want to add a toast notification here
+                    alert('Website link copied to clipboard!');
+                  }
+                } catch (error) {
+                  console.error('Error sharing/copying:', error);
+                  // Fallback to copying to clipboard
+                  try {
+                    await navigator.clipboard.writeText(websiteUrl);
+                    alert('Website link copied to clipboard!');
+                  } catch (clipboardError) {
+                    console.error('Clipboard error:', clipboardError);
+                  }
+                }
+              }}
+            >
               <Heart className="h-4 w-4 mr-2" />
-              Quick Donate
+              Share Website
             </Button>
           </div>
         </div>

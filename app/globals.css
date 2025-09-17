@@ -166,6 +166,23 @@
     @apply bg-primary/50 rounded-full hover:bg-primary/70;
   }
 
+  /* Hide scrollbar utility - Cross-browser compatible */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+    overflow: -moz-scrollbars-none;  /* Firefox legacy */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+    width: 0px;
+    background: transparent;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
   /* Mobile optimizations */
   .touch-manipulation {
     touch-action: manipulation;

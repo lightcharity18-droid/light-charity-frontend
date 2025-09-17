@@ -70,7 +70,7 @@ export default function DonatePage() {
 
       <footer className="py-6 border-t bg-card">
         <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Light Charity. All rights reserved.
+          &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved.
         </div>
       </footer>
 

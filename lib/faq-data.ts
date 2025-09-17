@@ -7,8 +7,8 @@ export interface FaqItem {
 export const faqData: FaqItem[] = [
   {
     id: 1,
-    question: "What is Light Charity and how does it work?",
-    answer: "Light Charity is a comprehensive platform that connects blood donors with recipients, hospitals, and blood banks. We facilitate life-saving blood donations, organ donations, and provide emergency medical support through our integrated network of healthcare partners and volunteers.",
+    question: "What is Light Charity Foundation and how does it work?",
+    answer: "Light Charity Foundation is a comprehensive platform that connects blood donors with recipients, hospitals, and blood banks. We facilitate life-saving blood donations, organ donations, and provide emergency medical support through our integrated network of healthcare partners and volunteers.",
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ export const faqData: FaqItem[] = [
   {
     id: 4,
     question: "Are there any costs involved in donating or receiving blood?",
-    answer: "Blood donation through Light Charity is completely free for donors. For recipients, we work with insurance providers and offer financial assistance programs. Our goal is to ensure that cost never becomes a barrier to accessing life-saving blood when needed.",
+    answer: "Blood donation through Light Charity Foundation is completely free for donors. For recipients, we work with insurance providers and offer financial assistance programs. Our goal is to ensure that cost never becomes a barrier to accessing life-saving blood when needed.",
   },
   {
     id: 5,
@@ -32,12 +32,12 @@ export const faqData: FaqItem[] = [
   },
   {
     id: 6,
-    question: "What other services does Light Charity provide?",
+    question: "What other services does Light Charity Foundation provide?",
     answer: "Beyond blood donation, we facilitate organ donation registration, provide disaster relief coordination, support community health initiatives, and offer educational resources about health and wellness. We also run volunteer programs and partner with local organizations for comprehensive community support.",
   },
   {
     id: 7,
-    question: "How can I volunteer with Light Charity?",
+    question: "How can I volunteer with Light Charity Foundation?",
     answer: "We offer various volunteer opportunities including event coordination, donor outreach, community education, and emergency response support. Visit our volunteer section to explore available positions and apply. We provide training and support for all our volunteers.",
   },
   {

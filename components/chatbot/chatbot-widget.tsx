@@ -227,7 +227,7 @@ How can I assist you today?`,
   const getEnhancedBotResponse = (message: string): string => {
     // More comprehensive fallback responses with better formatting
     if (message.includes("hello") || message.includes("hi") || message.includes("hey")) {
-      return `Hello! 👋 Welcome to Light Charity's Blood Donation Assistant!
+      return `Hello! 👋 Welcome to Light Charity Foundation's Blood Donation Assistant!
 
 ## I'm here to help you with:
 

@@ -66,9 +66,14 @@ export const scaleIn: Variants = {
 
 // Stagger container for multiple children
 export const staggerContainer: Variants = {
+  initial: {
+    opacity: 0,
+  },
   animate: {
+    opacity: 1,
     transition: {
       staggerChildren: 0.1,
+      delayChildren: 0.2,
     },
   },
 };

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
@@ -11,6 +11,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 import { TwoFactorModal } from "./two-factor-modal"
 
@@ -20,6 +22,9 @@ export function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false)
   const [showTwoFactor, setShowTwoFactor] = useState(false)
   const { login, isLoading } = useAuth()
+  const router = useRouter()
+  const { toast } = useToast()
+  const googleButtonRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,10 +41,118 @@ export function LoginForm() {
     }
   }
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth integration
-    console.log("Google login not implemented yet")
-  }
+  // Load Google Identity Services script and render button
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        // Add a small delay to ensure the button container is ready
+        setTimeout(initializeGoogleSignIn, 100);
+      };
+      
+      // Check if script already exists
+      const existingScript = document.getElementById('google-identity-script');
+      if (existingScript) {
+        // If script exists but Google isn't loaded yet, wait for it
+        if (typeof window.google === 'undefined') {
+          existingScript.onload = () => setTimeout(initializeGoogleSignIn, 100);
+        } else {
+          // Google is already loaded, initialize immediately
+          setTimeout(initializeGoogleSignIn, 100);
+        }
+        return;
+      }
+      
+      script.id = 'google-identity-script';
+      document.head.appendChild(script);
+    };
+
+    const initializeGoogleSignIn = () => {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      
+      if (!clientId) {
+        console.error('Google Client ID not configured');
+        return;
+      }
+
+      if (typeof window.google === 'undefined') {
+        console.error('Google Identity Services not loaded');
+        return;
+      }
+
+      if (!googleButtonRef.current) {
+        console.error('Google button container not found');
+        return;
+      }
+
+      // Clear any existing button content
+      googleButtonRef.current.innerHTML = '';
+
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCallback,
+        });
+
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          width: '100%',
+          shape: 'rectangular',
+        });
+        
+        console.log('Google Sign-In button rendered successfully');
+      } catch (error) {
+        console.error('Error rendering Google button:', error);
+      }
+    };
+
+    // Delay the script loading to ensure component is fully mounted
+    const timer = setTimeout(loadGoogleScript, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+
+  const handleGoogleCallback = async (response: any) => {
+    try {
+      if (!response.credential) {
+        throw new Error('No credential received from Google');
+      }
+
+      // Use auth service for Google authentication
+      const { authService } = await import('@/lib/auth');
+      
+      const data = await authService.googleAuth({
+        googleToken: response.credential,
+        userType: 'donor', // Default to donor, could be made configurable
+      });
+
+      if (data.success) {
+        // Redirect based on user status - use window.location for full page reload
+        // This ensures proper auth state initialization
+        if (data.isNewUser || data.requiresCompletion) {
+          // New Google users or users with incomplete profiles need to complete their info
+          window.location.href = '/profile?complete=true&source=google';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      } else {
+        throw new Error(data.message || 'Google authentication failed');
+      }
+    } catch (error: any) {
+      console.error('Google callback error:', error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Google authentication failed. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleTwoFactorComplete = () => {
     setShowTwoFactor(false)
@@ -119,28 +232,11 @@ export function LoginForm() {
                 <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
-            <Button type="button" variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  fill="#EA4335"
-                />
-                <path d="M1 1h22v22H1z" fill="none" />
-              </svg>
-              Sign in with Google
-            </Button>
+            {/* Google Sign-In Button Container */}
+            <div 
+              ref={googleButtonRef} 
+              className="w-full [&>div]:w-full [&>div>div]:w-full [&>div>div>iframe]:w-full [&>div>div>iframe]:min-h-[40px] [&>div>div>iframe]:border [&>div>div>iframe]:border-input [&>div>div>iframe]:rounded-md [&>div>div>iframe]:bg-background"
+            ></div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">

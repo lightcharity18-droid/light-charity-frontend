@@ -16,7 +16,7 @@ export default function LoginPage() {
 
       <footer className="py-6 border-t">
         <div className="container text-center text-sm text-gray-600">
-          &copy; {new Date().getFullYear()} Light Charity. All rights reserved.
+          &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved.
         </div>
       </footer>
     </div>

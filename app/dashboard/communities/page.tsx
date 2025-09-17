@@ -333,20 +333,28 @@ export default function CommunitiesPage() {
               </span>
             </div>
             
-            {showJoinButton && !isMember && (
+            <div className="flex gap-2">
+              {showJoinButton && !isMember && (
+                <Button 
+                  size="sm" 
+                  onClick={() => joinCommunity(community._id)}
+                >
+                  Join
+                </Button>
+              )}
+              {isMember && (
+                <Badge variant="secondary">
+                  Member
+                </Badge>
+              )}
               <Button 
                 size="sm" 
-                onClick={() => joinCommunity(community._id)}
-                className="ml-2"
+                variant="outline"
+                onClick={() => window.location.href = `/dashboard/messages?community=${community._id}`}
               >
-                Join
+                Open
               </Button>
-            )}
-            {isMember && (
-              <Badge variant="secondary" className="ml-2">
-                Member
-              </Badge>
-            )}
+            </div>
           </div>
         </CardContent>
       </Card>

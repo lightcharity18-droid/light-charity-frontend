@@ -40,7 +40,7 @@ const volunteerOpportunities = [
     id: 3,
     title: "Community Outreach Ambassador",
     description:
-      "Represent Light Charity at community events, schools, and businesses to educate the public about blood donation and recruit new donors.",
+      "Represent Light Charity Foundation at community events, schools, and businesses to educate the public about blood donation and recruit new donors.",
     location: "Various Locations",
     commitment: "Monthly, 2-4 hours",
     skills: ["Public Speaking", "Enthusiasm", "Knowledge of Blood Donation"],
@@ -353,7 +353,7 @@ export default function VolunteerPage() {
                   </div>
                   <h3 className="text-xl font-bold mb-2 text-foreground">Start Volunteering</h3>
                   <p className="text-muted-foreground">
-                    Begin your volunteer journey with Light Charity and start making a difference in your community.
+                    Begin your volunteer journey with Light Charity Foundation and start making a difference in your community.
                   </p>
                 </CardContent>
               </Card>
@@ -411,7 +411,7 @@ export default function VolunteerPage() {
           <div className="container max-w-3xl">
             <h2 className="text-3xl font-bold mb-6 text-center text-foreground">Ready to Join Us?</h2>
             <p className="text-center text-muted-foreground mb-8">
-              Fill out the form below to start your volunteer journey with Light Charity.
+              Fill out the form below to start your volunteer journey with Light Charity Foundation.
             </p>
 
             <VolunteerApplicationForm />
@@ -512,7 +512,7 @@ export default function VolunteerPage() {
 
       <footer className="bg-muted/30 border-t py-12">
         <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Light Charity. All rights reserved.
+          &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved.
         </div>
       </footer>
       <Toaster />

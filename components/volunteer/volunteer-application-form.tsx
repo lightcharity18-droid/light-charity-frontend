@@ -224,7 +224,7 @@ export function VolunteerApplicationForm() {
 
           <div className="space-y-2">
             <label htmlFor="message" className="text-sm font-medium text-foreground">
-              Why do you want to volunteer with Light Charity?
+              Why do you want to volunteer with Light Charity Foundation?
             </label>
             <textarea
               id="message"

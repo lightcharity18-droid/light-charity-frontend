@@ -7,7 +7,7 @@ export function Logo() {
       <div className="relative w-10 h-10 flex-shrink-0">
         <Image
           src="/images/light-charity-logo-new.png"
-          alt="Light Charity Logo"
+          alt="Light Charity Foundation Logo"
           width={40}
           height={40}
           className="object-contain"
@@ -15,8 +15,8 @@ export function Logo() {
         />
       </div>
       <span className="text-xl font-bold tracking-wider">
-        <span className="gradient-text-fallback gradient-text" style={{ lineHeight: "1.3" }}>
-          Light Charity
+        <span className="gradient-text-fallback gradient-text line-height-tight">
+          Light Charity Foundation
         </span>
       </span>
     </Link>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, Calendar, Home, LogOut, Mail, MapPin, Menu, Settings, Users, Droplet, PenTool, MessageCircle } from "lucide-react"
+import { Bell, Calendar, Home, LogOut, Mail, MapPin, Menu, Settings, Users, Droplet, PenTool, MessageCircle, Heart, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -55,6 +55,18 @@ export function DashboardNavigation({ isMobile = false }: DashboardNavigationPro
       href: "/dashboard/messages",
       icon: Mail,
       label: "Messages",
+      show: true
+    },
+    {
+      href: "/organ-donation",
+      icon: Heart,
+      label: "Organ Donation",
+      show: true
+    },
+    {
+      href: "/fundraising",
+      icon: TrendingUp,
+      label: "Fundraising",
       show: true
     },
     {

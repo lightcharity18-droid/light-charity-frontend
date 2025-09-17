@@ -74,7 +74,7 @@ export default function LocationsPage() {
 
       <footer className="py-6 border-t bg-gray-900 dark:bg-gray-900">
         <div className="container text-center text-sm text-white">
-          &copy; {new Date().getFullYear()} Light Charity. All rights reserved.
+          &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved.
         </div>
       </footer>
 

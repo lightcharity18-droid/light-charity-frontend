@@ -392,7 +392,7 @@ export default function BlogPage() {
               <CardContent className="p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4 text-foreground">Stay Updated</h3>
                 <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                  Subscribe to our newsletter to receive the latest news, stories, and updates from Light Charity
+                  Subscribe to our newsletter to receive the latest news, stories, and updates from Light Charity Foundation
                   directly in your inbox.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
@@ -409,7 +409,7 @@ export default function BlogPage() {
 
       <footer className="bg-muted/30 border-t py-12">
         <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Light Charity. All rights reserved.
+          &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved.
         </div>
       </footer>
     </div>

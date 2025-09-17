@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -43,6 +44,7 @@ interface Community {
 }
 
 export default function MessagesPage() {
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(true)
   const [communities, setCommunities] = useState<Community[]>([])
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null)
@@ -380,6 +382,22 @@ export default function MessagesPage() {
       clearInterval(refreshInterval);
     };
   }, [loadCommunities, loadCurrentUser]);
+
+  // Handle community parameter from URL
+  useEffect(() => {
+    const communityId = searchParams.get('community');
+    if (communityId && communities.length > 0) {
+      const community = communities.find(c => c._id === communityId);
+      if (community && community !== selectedCommunity) {
+        setSelectedCommunity(community);
+        loadCommunityMessages(communityId);
+        // Hide sidebar on mobile when community is selected
+        if (isMobile) {
+          setShowSidebar(false);
+        }
+      }
+    }
+  }, [searchParams, communities, selectedCommunity, loadCommunityMessages, isMobile]);
 
   const filteredCommunities = communities.filter(
     (community) =>

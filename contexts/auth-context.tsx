@@ -97,7 +97,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.data.user)
         toast({
           title: 'Account created',
-          description: `Welcome to Light Charity, ${
+          description: `Welcome to Light Charity Foundation, ${
             data.userType === 'donor' 
               ? `${data.firstName} ${data.lastName}` 
               : data.name

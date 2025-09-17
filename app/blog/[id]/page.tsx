@@ -228,7 +228,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
                       <h3 className="font-bold text-lg">{post.author}</h3>
                       <p className="text-primary text-sm mb-2">Author</p>
                       <p className="text-sm text-muted-foreground mb-4">
-                        Contributing writer for Light Charity's mission to save lives through blood donation.
+                        Contributing writer for Light Charity Foundation's mission to save lives through blood donation.
                       </p>
                       <Button variant="outline" size="sm" className="w-full" asChild>
                         <Link href="/blog">View All Posts</Link>
@@ -355,7 +355,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
 
       <footer className="bg-muted/30 border-t py-12">
         <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Light Charity. All rights reserved.
+          &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved.
         </div>
       </footer>
     </div>

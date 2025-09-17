@@ -24,7 +24,7 @@ export function AnimatedCard({
 }: AnimatedCardProps) {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
 
-  const getDirectionVariants = () => {
+  const getDirectionVariants = (): any => {
     switch (direction) {
       case "left":
         return fadeInUp; // We'll create fadeInLeft later
@@ -35,8 +35,7 @@ export function AnimatedCard({
           initial: { opacity: 0, scale: 0.8 },
           animate: { 
             opacity: 1, 
-            scale: 1,
-            transition: { delay, duration: 0.5 }
+            scale: 1
           }
         };
       default:
@@ -44,10 +43,6 @@ export function AnimatedCard({
           ...fadeInUp,
           animate: {
             ...fadeInUp.animate,
-            transition: {
-              ...fadeInUp.animate?.transition,
-              delay,
-            },
           },
         };
     }
@@ -55,12 +50,11 @@ export function AnimatedCard({
 
   return (
     <motion.div
-      variants={getDirectionVariants()}
+      variants={hoverEffect ? cardHover : getDirectionVariants()}
       initial="initial"
       whileInView="animate"
       viewport={{ once: true, amount: 0.3 }}
       whileHover={hoverEffect ? "hover" : undefined}
-      variants={hoverEffect ? cardHover : getDirectionVariants()}
       className="cursor-pointer"
       onClick={onClick}
       onMouseMove={(e) => {

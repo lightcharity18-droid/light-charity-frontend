@@ -392,7 +392,7 @@ export function NavBar() {
               ))}
               <Link
               href="/fundraising"
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg bg-black text-white hover:bg-gray-800 w-full"
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 w-full"
               onClick={() => setIsMobileMenuOpen(false)} // closes menu after click
 >
               Fundraising
@@ -401,7 +401,14 @@ export function NavBar() {
 
             {isAuthenticated && displayUser && (
               <div className="border-t border-border pt-2 mt-2">
-                
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-primary/10 hover:text-primary transition-colors touch-manipulation"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Home className="h-4 w-4" />
+                  Dashboard
+                </Link>
                 <Link
                   href="/dashboard/settings"
                   className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-primary/10 hover:text-primary transition-colors touch-manipulation"

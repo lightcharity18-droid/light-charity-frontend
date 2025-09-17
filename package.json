@@ -11,6 +11,7 @@
     "netlify-build": "pnpm install --shamefully-hoist && pnpm run build"
   },
   "dependencies": {
+    "@google-cloud/local-auth": "^3.0.1",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -46,6 +47,7 @@
     "date-fns": "latest",
     "embla-carousel-react": "8.5.1",
     "framer-motion": "^12.23.6",
+    "googleapis": "^160.0.0",
     "highlight.js": "^11.10.0",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",

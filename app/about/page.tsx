@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import Image from "next/image"
 import { Heart, Users, Globe, Award, Target, Eye, Lightbulb, Shield, TrendingUp, MapPin, Mail } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AnimatedButton } from "@/components/ui/animated-card"
@@ -70,8 +71,8 @@ export default function AboutPage() {
                 className="text-5xl md:text-6xl font-bold mb-6 text-center"
                 variants={fadeInUp}
               >
-                <span className="gradient-text-fallback gradient-text" style={{ lineHeight: "1.3" }}>
-                  About Light Charity
+                <span className="gradient-text-fallback gradient-text line-height-tight">
+                  About Light Charity Foundation
                 </span>
               </motion.h1>
               
@@ -82,35 +83,6 @@ export default function AboutPage() {
                 Every drop of blood, every tree planted, every life touched—our mission is to save lives and build hope. From connecting donors worldwide to bringing clean water, disaster relief, and greener cities, Light Charity Foundation stands for humanity, health, and a brighter future.
               </motion.p>
               
-              {/* Stats section with animations */}
-              <motion.div 
-                className="grid grid-cols-3 gap-8 mt-12 max-w-2xl mx-auto"
-                variants={fadeInUp}
-              >
-                {[
-                  { number: "10K+", label: "Lives Saved", icon: Heart },
-                  { number: "500+", label: "Partners", icon: Users },
-                  { number: "50+", label: "Countries", icon: Globe }
-                ].map((stat, index) => (
-                  <motion.div
-                    key={stat.label}
-                    className="text-center group"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                  >
-                    <motion.div
-                      className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mb-3 group-hover:shadow-lg transition-shadow"
-                      whileHover={{ rotate: 5 }}
-                    >
-                      <stat.icon className="h-6 w-6 text-white" />
-                    </motion.div>
-                    <div className="text-2xl font-bold text-foreground">{stat.number}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </motion.div>
-                ))}
-              </motion.div>
             </motion.div>
           </div>
         </section>
@@ -702,9 +674,9 @@ export default function AboutPage() {
         </section>
       </main>
 
-      <footer className="relative w-full bg-gradient-to-b from-gray-900 via-gray-800 to-black overflow-hidden py-16">
+      <footer className="relative w-full bg-gradient-to-b from-gray-100 via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-black overflow-hidden py-16">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent dark:from-black/20 dark:to-transparent"></div>
         
         {/* Floating background elements */}
         <motion.div
@@ -738,37 +710,23 @@ export default function AboutPage() {
             >
               <div className="flex items-center gap-3">
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Heart className="h-6 w-6 text-white" />
+                  <Image 
+                    src="/images/light-charity-logo-new.png" 
+                    alt="Light Charity Foundation Logo" 
+                    width={48} 
+                    height={48}
+                    className="rounded-xl"
+                  />
                 </motion.div>
-                <span className="text-2xl font-bold">Light Charity</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">Light Charity Foundation</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 Be a Light. Donate, <br /> Save Lives. Together, we're building a healthier, more caring community.
               </p>
-              <div className="flex space-x-4">
-                {[
-                  { icon: "f", label: "Facebook" },
-                  { icon: "t", label: "Twitter" },
-                  { icon: "in", label: "LinkedIn" }
-                ].map((social, index) => (
-                  <motion.div
-                    key={social.label}
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer"
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
-                  >
-                    <span className="text-sm font-medium">{social.icon}</span>
-                  </motion.div>
-                ))}
-              </div>
             </motion.div>
 
             {/* Quick Links */}
@@ -780,7 +738,7 @@ export default function AboutPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Quick Links</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Quick Links</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -790,22 +748,23 @@ export default function AboutPage() {
                   { name: "FAQs", href: "/faqs" },
                   { name: "Blood Compatibility", href: "/blood-compatibility" }
                 ].map((link, index) => (
-                  <motion.li
-                    key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
-                  >
+                  <li key={link.name}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                    >
                     <Link 
                       href={link.href} 
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                      className="text-gray-600 dark:text-gray-400 hover:text-orange-400 dark:hover:text-orange-400 transition-colors text-sm group flex items-center"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         {link.name}
                       </span>
                     </Link>
-                  </motion.li>
+                    </motion.div>
+                  </li>
                 ))}
               </ul>
             </motion.div>
@@ -819,7 +778,7 @@ export default function AboutPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-red-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Get Involved</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Get Involved</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -829,22 +788,23 @@ export default function AboutPage() {
                   { name: "Fundraising", href: "/fundraising" },
                   { name: "Blog & News", href: "/blog" }
                 ].map((link, index) => (
-                  <motion.li
-                    key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
-                  >
+                  <li key={link.name}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
+                    >
                     <Link 
                       href={link.href} 
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                      className="text-gray-600 dark:text-gray-400 hover:text-orange-400 dark:hover:text-orange-400 transition-colors text-sm group flex items-center"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         {link.name}
                       </span>
                     </Link>
-                  </motion.li>
+                    </motion.div>
+                  </li>
                 ))}
               </ul>
             </motion.div>
@@ -858,19 +818,18 @@ export default function AboutPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Stay Connected</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Stay Connected</h3>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-orange-400" />
-                  <span className="text-gray-400 text-sm">info@lightcharity.org</span>
                 </div>
                 <div>
-                  <h4 className="font-medium mb-3 text-white">Newsletter</h4>
+                  <h4 className="font-medium mb-3 text-gray-900 dark:text-white">Newsletter</h4>
                   <div className="flex gap-2">
                     <Input
                       placeholder="Your email"
-                      className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 text-sm"
+                      className="bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-orange-500 text-sm"
                     />
                     <AnimatedButton 
                       className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-sm px-4"
@@ -885,14 +844,14 @@ export default function AboutPage() {
 
           {/* Footer bottom */}
           <motion.div 
-            className="border-t border-gray-800 pt-8 text-center"
+            className="border-t border-gray-300 dark:border-gray-800 pt-8 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} Light Charity. All rights reserved. | Privacy Policy | Terms of Service
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved. | Privacy Policy | Terms of Service
             </p>
           </motion.div>
         </div>

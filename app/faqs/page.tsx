@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { AnimatedButton } from "@/components/ui/animated-card"
 import { Heart, HelpCircle, Users, Shield, Clock, Phone, Gift, DollarSign, Award, Mail, CalendarDays, TrendingUp } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { fadeInUp, staggerContainer, floating } from "@/lib/animations"
 import CategorizedFaqAccordion from "@/components/ui/categorized-faq-accordion"
@@ -40,45 +41,8 @@ const categories = [
 
 export default function FAQsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("blood")
-  const [statsAnimated, setStatsAnimated] = useState(false)
 
   const currentCategory = categorizedFaqData[selectedCategory as keyof typeof categorizedFaqData] || categorizedFaqData.blood
-
-  // Count up animation for stats
-  const [stats, setStats] = useState([
-    { icon: Heart, label: "Lives Saved Daily", value: 0, target: 42, color: "text-red-500" },
-    { icon: Users, label: "Active Donors", value: 0, target: 1250, color: "text-blue-500" },
-    { icon: Shield, label: "Safety Rate", value: 0, target: 99.9, color: "text-green-500", suffix: "%" },
-    { icon: Clock, label: "Donation Time", value: 0, target: 45, color: "text-orange-500", suffix: " Minutes" },
-  ])
-
-  useEffect(() => {
-    if (statsAnimated) return
-    
-    const timer = setTimeout(() => {
-      setStatsAnimated(true)
-      stats.forEach((stat, index) => {
-        const duration = 2000 // 2 seconds
-        const steps = 60 // 60 steps for smooth animation
-        const increment = stat.target / steps
-        let current = 0
-        
-        const interval = setInterval(() => {
-          current += increment
-          if (current >= stat.target) {
-            current = stat.target
-            clearInterval(interval)
-          }
-          
-          setStats(prev => prev.map((s, i) => 
-            i === index ? { ...s, value: current } : s
-          ))
-        }, duration / steps)
-      })
-    }, 500)
-    
-    return () => clearTimeout(timer)
-  }, [statsAnimated])
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -138,47 +102,6 @@ export default function FAQsPage() {
           </div>
         </section>
 
-        {/* Quick Stats */}
-        <section className="py-8 md:py-16 bg-background">
-          <div className="container px-4">
-            <motion.div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6 }}
-            >
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                >
-                  <Card className="text-center hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4 md:p-6">
-                      <motion.div
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                    <stat.icon className={`h-6 w-6 md:h-8 md:w-8 ${stat.color} mx-auto mb-2 md:mb-3`} />
-                      </motion.div>
-                      <motion.div 
-                        className="text-lg md:text-2xl font-bold text-foreground mb-1"
-                        key={stat.value} // This ensures re-render when value changes
-                      >
-                        {Math.round(stat.value * 10) / 10}{stat.suffix || ""}
-                      </motion.div>
-                    <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
-                  </CardContent>
-                </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
 
         {/* Dynamic FAQ Categories */}
         <section className="py-8 md:py-16 bg-muted/30">
@@ -333,7 +256,7 @@ export default function FAQsPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 text-white relative overflow-hidden">
+        <section className="py-24 bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 text-gray-900 dark:text-white relative overflow-hidden">
           {/* Enhanced background effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 to-red-600/20"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
@@ -365,7 +288,7 @@ export default function FAQsPage() {
                 viewport={{ once: true, amount: 0.5 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <Badge className="bg-white/20 text-white hover:bg-white/30 border-white/20 mb-6">
+                <Badge className="bg-white/20 text-gray-900 dark:text-white hover:bg-white/30 border-white/20 mb-6">
                   <Award className="h-3 w-3 mr-1" />
                   Join Our Mission
                 </Badge>
@@ -410,7 +333,7 @@ export default function FAQsPage() {
                 <AnimatedButton
                   size="lg"
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
+                  className="border-white/30 text-gray-900 dark:text-white hover:bg-white/10 hover:text-gray-900 dark:text-white hover:border-white/50"
                   onClick={() => window.location.href = '/volunteer'}
                 >
                   Volunteer With Us
@@ -421,9 +344,9 @@ export default function FAQsPage() {
         </section>
       </main>
 
-      <footer className="relative w-full bg-gradient-to-b from-gray-900 via-gray-800 to-black overflow-hidden py-16">
+      <footer className="relative w-full bg-gradient-to-b from-gray-100 via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-black overflow-hidden py-16">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent dark:from-black/20 dark:to-transparent"></div>
         
         {/* Floating background elements */}
         <motion.div
@@ -457,37 +380,23 @@ export default function FAQsPage() {
             >
               <div className="flex items-center gap-3">
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Heart className="h-6 w-6 text-white" />
+                  <Image 
+                    src="/images/light-charity-logo-new.png" 
+                    alt="Light Charity Foundation Logo" 
+                    width={48} 
+                    height={48}
+                    className="rounded-xl"
+                  />
                 </motion.div>
-                <span className="text-2xl font-bold">Light Charity</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">Light Charity Foundation</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 Be a Light. Donate, <br /> Save Lives. Together, we're building a healthier, more caring community.
               </p>
-              <div className="flex space-x-4">
-                {[
-                  { icon: "f", label: "Facebook" },
-                  { icon: "t", label: "Twitter" },
-                  { icon: "in", label: "LinkedIn" }
-                ].map((social, index) => (
-                  <motion.div
-                    key={social.label}
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer"
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
-                  >
-                    <span className="text-sm font-medium">{social.icon}</span>
-                  </motion.div>
-                ))}
-              </div>
             </motion.div>
 
             {/* Quick Links */}
@@ -499,7 +408,7 @@ export default function FAQsPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Quick Links</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Quick Links</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -509,22 +418,23 @@ export default function FAQsPage() {
                   { name: "FAQs", href: "/faqs" },
                   { name: "Blood Compatibility", href: "/blood-compatibility" }
                 ].map((link, index) => (
-                  <motion.li
-                    key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
-                  >
+                  <li key={link.name}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                    >
                     <Link 
                       href={link.href} 
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                      className="text-gray-600 dark:text-gray-400 hover:text-orange-400 dark:hover:text-orange-400 transition-colors text-sm group flex items-center"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         {link.name}
                       </span>
                     </Link>
-                  </motion.li>
+                    </motion.div>
+                  </li>
                 ))}
               </ul>
             </motion.div>
@@ -538,7 +448,7 @@ export default function FAQsPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-red-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Get Involved</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Get Involved</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -548,22 +458,23 @@ export default function FAQsPage() {
                   { name: "Fundraising", href: "/fundraising" },
                   { name: "Blog & News", href: "/blog" }
                 ].map((link, index) => (
-                  <motion.li
-                    key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
-                  >
+                  <li key={link.name}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
+                    >
                     <Link 
                       href={link.href} 
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                      className="text-gray-600 dark:text-gray-400 hover:text-orange-400 dark:hover:text-orange-400 transition-colors text-sm group flex items-center"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         {link.name}
                       </span>
                     </Link>
-                  </motion.li>
+                    </motion.div>
+                  </li>
                 ))}
               </ul>
             </motion.div>
@@ -577,19 +488,18 @@ export default function FAQsPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Stay Connected</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Stay Connected</h3>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-orange-400" />
-                  <span className="text-gray-400 text-sm">info@lightcharity.org</span>
                 </div>
                 <div>
-                  <h4 className="font-medium mb-3 text-white">Newsletter</h4>
+                  <h4 className="font-medium mb-3 text-gray-900 dark:text-white">Newsletter</h4>
                   <div className="flex gap-2">
                     <Input
                       placeholder="Your email"
-                      className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 text-sm"
+                      className="bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-orange-500 text-sm"
                     />
                     <AnimatedButton 
                       className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-sm px-4"
@@ -604,14 +514,14 @@ export default function FAQsPage() {
 
           {/* Footer bottom */}
           <motion.div 
-            className="border-t border-gray-800 pt-8 text-center"
+            className="border-t border-gray-300 dark:border-gray-800 pt-8 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} Light Charity. All rights reserved. | Privacy Policy | Terms of Service
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved. | Privacy Policy | Terms of Service
             </p>
           </motion.div>
         </div>

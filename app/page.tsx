@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
+import Image from "next/image"
 import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
 import { NavBar } from "@/components/nav-bar"
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, Clock, Droplet, FileText, Heart, Users, Shield, Award, MapPin, Phone, Mail, TrendingUp, CheckCircle, Star, ArrowRight } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { motion } from "framer-motion"
 import { fadeInUp, staggerContainer, floating } from "@/lib/animations"
@@ -53,10 +54,90 @@ export default function Home() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { user, isAuthenticated, login } = useAuth()
+  const googleButtonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetchLatestBlogs()
   }, [])
+
+  // Load Google Identity Services script and render button
+  useEffect(() => {
+    // Only load Google script if user is not authenticated
+    if (isAuthenticated) return
+
+    const loadGoogleScript = () => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        // Add a small delay to ensure the button container is ready
+        setTimeout(initializeGoogleSignIn, 100);
+      };
+      
+      // Check if script already exists
+      const existingScript = document.getElementById('google-identity-script');
+      if (existingScript) {
+        // If script exists but Google isn't loaded yet, wait for it
+        if (typeof window.google === 'undefined') {
+          existingScript.onload = () => setTimeout(initializeGoogleSignIn, 100);
+        } else {
+          // Google is already loaded, initialize immediately
+          setTimeout(initializeGoogleSignIn, 100);
+        }
+        return;
+      }
+      
+      script.id = 'google-identity-script';
+      document.head.appendChild(script);
+    };
+
+    const initializeGoogleSignIn = () => {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      
+      if (!clientId) {
+        console.error('Google Client ID not configured');
+        return;
+      }
+
+      if (typeof window.google === 'undefined') {
+        console.error('Google Identity Services not loaded');
+        return;
+      }
+
+      if (!googleButtonRef.current) {
+        console.error('Google button container not found');
+        return;
+      }
+
+      // Clear any existing button content
+      googleButtonRef.current.innerHTML = '';
+
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCallback,
+        });
+
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          width: '100%',
+          shape: 'rectangular',
+        });
+        
+        console.log('Google Sign-In button rendered successfully on home page');
+      } catch (error) {
+        console.error('Error rendering Google button:', error);
+      }
+    };
+
+    // Delay the script loading to ensure component is fully mounted
+    const timer = setTimeout(loadGoogleScript, 100);
+    
+    return () => clearTimeout(timer);
+  }, [isAuthenticated])
 
   const fetchLatestBlogs = async () => {
     try {
@@ -115,6 +196,39 @@ export default function Home() {
       console.error('Login error:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // Handle Google Sign-In callback
+  const handleGoogleCallback = async (response: any) => {
+    try {
+      if (!response.credential) {
+        throw new Error('No credential received from Google');
+      }
+
+      // Use auth service for Google authentication
+      const { authService } = await import('@/lib/auth');
+      
+      const data = await authService.googleAuth({
+        googleToken: response.credential,
+        userType: 'donor', // Default to donor for home page
+      });
+
+      if (data.success) {
+        // Redirect based on user status - use window.location for full page reload
+        // This ensures proper auth state initialization
+        if (data.isNewUser || data.requiresCompletion) {
+          // New Google users or users with incomplete profiles need to complete their info
+          window.location.href = '/profile?complete=true&source=google';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      } else {
+        throw new Error(data.message || 'Google authentication failed');
+      }
+    } catch (error: any) {
+      console.error('Google callback error:', error);
+      // You could add a toast notification here if needed
     }
   }
 
@@ -215,57 +329,6 @@ export default function Home() {
                 </AnimatedButton>
               </motion.div>
 
-              {/* Stats */}
-              <motion.div 
-                className="grid grid-cols-3 gap-6 pt-8"
-                variants={fadeInUp}
-              >
-                <motion.div 
-                  className="text-center"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <motion.div 
-                    className="text-2xl font-bold text-orange-600 dark:text-orange-400"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
-                  >
-                    0
-                  </motion.div>
-                  <div className="text-sm text-muted-foreground">Lives Saved</div>
-                </motion.div>
-                <motion.div 
-                  className="text-center"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <motion.div 
-                    className="text-2xl font-bold text-red-600 dark:text-red-400"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.7, duration: 0.5, type: "spring" }}
-                  >
-                    0
-                  </motion.div>
-                  <div className="text-sm text-muted-foreground">Active Donors</div>
-                </motion.div>
-                <motion.div 
-                  className="text-center"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <motion.div 
-                    className="text-2xl font-bold text-orange-600 dark:text-orange-400"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.9, duration: 0.5, type: "spring" }}
-                  >
-                    0
-                  </motion.div>
-                  <div className="text-sm text-muted-foreground">Centers</div>
-                </motion.div>
-              </motion.div>
             </motion.div>
 
             <motion.div 
@@ -320,36 +383,8 @@ export default function Home() {
                           Go to Dashboard
                         </AnimatedButton>
                       
-                        <AnimatedButton
-                        size="lg"
-                        variant="outline"
-                        className="w-full border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/50"
-                          onClick={() => window.location.href = '/donate'}
-                        >
-                          Schedule Donation
-                        </AnimatedButton>
                       </motion.div>
 
-                      <motion.div 
-                        className="mt-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.5 }}
-                        transition={{ duration: 0.5, delay: 0.5 }}
-                      >
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Your Impact:</span>
-                        <span className="font-semibold text-orange-600 dark:text-orange-400">
-                          {(user?.donationHistory?.length || 0)} donations
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm mt-1">
-                        <span className="text-muted-foreground">Lives Saved:</span>
-                        <span className="font-semibold text-red-600 dark:text-red-400">
-                          {(user?.donationHistory?.length || 0) * 3}
-                        </span>
-                      </div>
-                      </motion.div>
                   </CardContent>
                 </Card>
                 </motion.div>
@@ -468,28 +503,11 @@ export default function Home() {
                           viewport={{ once: true, amount: 0.5 }}
                           transition={{ duration: 0.4, delay: 0.9 }}
                         >
-                      <Button variant="outline" className="w-full h-12 border-border hover:bg-muted">
-                        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                          <path
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            fill="#4285F4"
-                          />
-                          <path
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            fill="#34A853"
-                          />
-                          <path
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                            fill="#FBBC05"
-                          />
-                          <path
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                            fill="#EA4335"
-                          />
-                          <path d="M1 1h22v22H1z" fill="none" />
-                        </svg>
-                        Sign in with Google
-                      </Button>
+                      {/* Google Sign-In Button Container */}
+                      <div 
+                        ref={googleButtonRef} 
+                        className="w-full [&>div]:w-full [&>div>div]:w-full [&>div>div>iframe]:w-full [&>div>div>iframe]:min-h-[40px] [&>div>div>iframe]:border [&>div>div>iframe]:border-input [&>div>div>iframe]:rounded-md [&>div>div>iframe]:bg-background"
+                      ></div>
                         </motion.div>
                         <motion.div 
                           className="text-center text-sm"
@@ -924,9 +942,9 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="relative w-full bg-gradient-to-b from-gray-900 via-gray-800 to-black overflow-hidden py-16">
+      <footer className="relative w-full bg-gradient-to-b from-gray-100 via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-black overflow-hidden py-16">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent dark:from-black/20 dark:to-transparent"></div>
         
         {/* Floating background elements */}
         <motion.div
@@ -960,37 +978,23 @@ export default function Home() {
             >
               <div className="flex items-center gap-3">
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Heart className="h-6 w-6 text-white" />
+                  <Image 
+                    src="/images/light-charity-logo-new.png" 
+                    alt="Light Charity Foundation Logo" 
+                    width={48} 
+                    height={48}
+                    className="rounded-xl"
+                  />
                 </motion.div>
-                <span className="text-2xl font-bold">Light Charity</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">Light Charity Foundation</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 Be a Light. Donate, <br /> Save Lives. Together, we're building a healthier, more caring community.
               </p>
-              <div className="flex space-x-4">
-                {[
-                  { icon: "f", label: "Facebook" },
-                  { icon: "t", label: "Twitter" },
-                  { icon: "in", label: "LinkedIn" }
-                ].map((social, index) => (
-                  <motion.div
-                    key={social.label}
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer"
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
-                  >
-                    <span className="text-sm font-medium">{social.icon}</span>
-                  </motion.div>
-                ))}
-                </div>
             </motion.div>
 
             {/* Quick Links */}
@@ -1002,7 +1006,7 @@ export default function Home() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Quick Links</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Quick Links</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -1012,22 +1016,23 @@ export default function Home() {
                   { name: "FAQs", href: "/faqs" },
                   { name: "Blood Compatibility", href: "/blood-compatibility" }
                 ].map((link, index) => (
-                  <motion.li
-                    key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
-                  >
+                  <li key={link.name}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                    >
                     <Link 
                       href={link.href} 
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                      className="text-gray-600 dark:text-gray-400 hover:text-orange-400 dark:hover:text-orange-400 transition-colors text-sm group flex items-center"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         {link.name}
                       </span>
                   </Link>
-                  </motion.li>
+                    </motion.div>
+                  </li>
                 ))}
               </ul>
             </motion.div>
@@ -1041,7 +1046,7 @@ export default function Home() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-red-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Get Involved</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Get Involved</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -1051,22 +1056,23 @@ export default function Home() {
                   { name: "Fundraising", href: "/fundraising" },
                   { name: "Blog & News", href: "/blog" }
                 ].map((link, index) => (
-                  <motion.li
-                    key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
-                  >
+                  <li key={link.name}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
+                    >
                     <Link 
                       href={link.href} 
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm group flex items-center"
+                      className="text-gray-600 dark:text-gray-400 hover:text-orange-400 dark:hover:text-orange-400 transition-colors text-sm group flex items-center"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         {link.name}
                       </span>
                   </Link>
-                  </motion.li>
+                    </motion.div>
+                  </li>
                 ))}
               </ul>
             </motion.div>
@@ -1080,19 +1086,18 @@ export default function Home() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-orange-500 rounded-sm"></div>
-                <h3 className="text-sm font-medium tracking-wider text-white uppercase">Stay Connected</h3>
+                <h3 className="text-sm font-medium tracking-wider text-gray-900 dark:text-white uppercase">Stay Connected</h3>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-orange-400" />
-                  <span className="text-gray-400 text-sm">info@lightcharity.org</span>
                 </div>
                 <div>
-                  <h4 className="font-medium mb-3 text-white">Newsletter</h4>
+                  <h4 className="font-medium mb-3 text-gray-900 dark:text-white">Newsletter</h4>
                 <div className="flex gap-2">
                   <Input
                     placeholder="Your email"
-                      className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 text-sm"
+                      className="bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-orange-500 text-sm"
                   />
                     <AnimatedButton 
                       className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-sm px-4"
@@ -1107,14 +1112,14 @@ export default function Home() {
 
           {/* Footer bottom */}
           <motion.div 
-            className="border-t border-gray-800 pt-8 text-center"
+            className="border-t border-gray-300 dark:border-gray-800 pt-8 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} Light Charity. All rights reserved. | Privacy Policy | Terms of Service
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              &copy; {new Date().getFullYear()} Light Charity Foundation. All rights reserved. | Privacy Policy | Terms of Service
             </p>
           </motion.div>
         </div>
