@@ -95,6 +95,8 @@ export function LoginForm() {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleCallback,
+          auto_select: false,
+          cancel_on_tap_outside: true,
         });
 
         window.google.accounts.id.renderButton(googleButtonRef.current, {
@@ -103,8 +105,6 @@ export function LoginForm() {
           text: 'signin_with',
           shape: 'rectangular',
         });
-        
-        console.log('Google Sign-In button rendered successfully');
       } catch (error) {
         console.error('Error rendering Google button:', error);
       }

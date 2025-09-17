@@ -117,6 +117,8 @@ export default function Home() {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleCallback,
+          auto_select: false,
+          cancel_on_tap_outside: true,
         });
 
         window.google.accounts.id.renderButton(googleButtonRef.current, {
@@ -125,8 +127,6 @@ export default function Home() {
           text: 'signin_with',
           shape: 'rectangular',
         });
-        
-        console.log('Google Sign-In button rendered successfully on home page');
       } catch (error) {
         console.error('Error rendering Google button:', error);
       }
