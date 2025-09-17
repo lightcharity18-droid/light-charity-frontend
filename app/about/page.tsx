@@ -438,10 +438,6 @@ export default function AboutPage() {
                           height={100}
                           className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
                           unoptimized
-                          onError={(e) => {
-                            console.error('Canadian Blood Services image failed to load:', e);
-                            e.currentTarget.style.display = 'none';
-                          }}
                         />
                       </Link>
                       </motion.div>
@@ -493,10 +489,6 @@ export default function AboutPage() {
                           height={100}
                           className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
                           unoptimized
-                          onError={(e) => {
-                            console.error('Tabios Foundation image failed to load:', e);
-                            e.currentTarget.style.display = 'none';
-                          }}
                         />
                       </Link>
                       </motion.div>
@@ -735,10 +727,6 @@ export default function AboutPage() {
                     height={48}
                     className="rounded-xl"
                     unoptimized
-                    onError={(e) => {
-                      console.error('Footer logo image failed to load:', e);
-                      e.currentTarget.style.display = 'none';
-                    }}
                   />
                 </motion.div>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">Light Charity Foundation</span>

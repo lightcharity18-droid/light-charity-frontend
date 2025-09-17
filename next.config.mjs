@@ -16,6 +16,9 @@ const nextConfig = {
   trailingSlash: true,
   // distDir: 'out',
   assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
 }
 
 export default nextConfig
