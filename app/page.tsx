@@ -65,6 +65,22 @@ export default function Home() {
     // Only load Google script if user is not authenticated
     if (isAuthenticated) return
 
+    // Add custom CSS to override Google button styling
+    const style = document.createElement('style');
+    style.textContent = `
+      .google-signin-button iframe {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+      .google-signin-button > div {
+        background: transparent !important;
+        border: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
     const loadGoogleScript = () => {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
@@ -504,7 +520,7 @@ export default function Home() {
                       {/* Google Sign-In Button Container */}
                       <div 
                         ref={googleButtonRef} 
-                        className="w-full flex justify-center [&>div]:w-full [&>div>div]:w-full [&>div>div]:flex [&>div>div]:justify-center [&>div>div>iframe]:!w-full [&>div>div>iframe]:!max-w-none [&>div>div>iframe]:!h-10 [&>div>div>iframe]:!min-h-[40px] [&>div>div>iframe]:!box-border"
+                        className="google-signin-button w-full flex justify-center [&>div]:w-full [&>div>div]:w-full [&>div>div]:flex [&>div>div]:justify-center [&>div>div>iframe]:!w-full [&>div>div>iframe]:!max-w-none [&>div>div>iframe]:!h-10 [&>div>div>iframe]:!min-h-[40px] [&>div>div>iframe]:!box-border"
                       ></div>
                         </motion.div>
                         <motion.div 
