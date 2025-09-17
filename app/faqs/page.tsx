@@ -390,6 +390,11 @@ export default function FAQsPage() {
                     width={48} 
                     height={48}
                     className="rounded-xl"
+                    unoptimized
+                    onError={(e) => {
+                      console.error('Footer logo image failed to load:', e);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </motion.div>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">Light Charity Foundation</span>

@@ -12,6 +12,12 @@ export function Logo() {
           height={40}
           className="object-contain"
           priority
+          unoptimized
+          onError={(e) => {
+            console.error('Logo image failed to load:', e);
+            // Fallback to a simple text logo if image fails
+            e.currentTarget.style.display = 'none';
+          }}
         />
       </div>
       <span className="text-xl font-bold tracking-wider">

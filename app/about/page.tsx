@@ -431,10 +431,17 @@ export default function AboutPage() {
                         rel="noopener noreferrer"
                         className="block"
                       >
-                        <img 
+                        <Image 
                           src="/images/canadian-blood-services-partnership.png" 
                           alt="Canadian Blood Services Partnership" 
+                          width={200}
+                          height={100}
                           className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
+                          unoptimized
+                          onError={(e) => {
+                            console.error('Canadian Blood Services image failed to load:', e);
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </Link>
                       </motion.div>
@@ -479,10 +486,17 @@ export default function AboutPage() {
                         rel="noopener noreferrer"
                         className="block"
                       >
-                        <img 
+                        <Image 
                           src="/images/tabios-foundation-logo.png" 
                           alt="The Tabios Foundation Partnership" 
+                          width={200}
+                          height={100}
                           className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
+                          unoptimized
+                          onError={(e) => {
+                            console.error('Tabios Foundation image failed to load:', e);
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </Link>
                       </motion.div>
@@ -720,6 +734,11 @@ export default function AboutPage() {
                     width={48} 
                     height={48}
                     className="rounded-xl"
+                    unoptimized
+                    onError={(e) => {
+                      console.error('Footer logo image failed to load:', e);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </motion.div>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">Light Charity Foundation</span>
