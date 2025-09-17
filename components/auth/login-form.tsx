@@ -92,11 +92,17 @@ export function LoginForm() {
       googleButtonRef.current.innerHTML = '';
 
       try {
+        // Disable any existing auto-select behavior
+        if (window.google.accounts.id.disableAutoSelect) {
+          window.google.accounts.id.disableAutoSelect();
+        }
+
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleCallback,
           auto_select: false,
           cancel_on_tap_outside: true,
+          use_fedcm_for_prompt: false,
         });
 
         window.google.accounts.id.renderButton(googleButtonRef.current, {

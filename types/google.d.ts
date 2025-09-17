@@ -12,8 +12,11 @@ interface GoogleAccounts {
       callback: (response: GoogleCredentialResponse) => void;
       auto_select?: boolean;
       cancel_on_tap_outside?: boolean;
+      use_fedcm_for_prompt?: boolean;
     }) => void;
     prompt: () => void;
+    disableAutoSelect: () => void;
+    cancel: () => void;
     renderButton: (
       element: HTMLElement,
       config: {
