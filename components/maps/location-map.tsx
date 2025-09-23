@@ -221,6 +221,32 @@ export function LocationMap() {
     setFilteredCenters(filtered)
   }, [centers, searchQuery])
 
+  // Apply distance radius on top of search filtering
+  useEffect(() => {
+    const radiusKm = parseInt(radiusFilter || '25') || 25
+    if (!userLocation || !radiusKm) return
+
+    const toRad = (deg: number) => (deg * Math.PI) / 180
+    const earthRadiusKm = 6371
+
+    setFilteredCenters(prev => {
+      const filtered = prev.filter(center => {
+        const lat1 = userLocation.lat
+        const lon1 = userLocation.lng
+        const lat2 = center.location.coordinates[1]
+        const lon2 = center.location.coordinates[0]
+        const dLat = toRad(lat2 - lat1)
+        const dLon = toRad(lon2 - lon1)
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        const distance = earthRadiusKm * c
+        return distance <= radiusKm
+      })
+      console.log(`?? Client radius filter (${radiusKm}km) → ${filtered.length}/${prev.length}`)
+      return filtered
+    })
+  }, [userLocation, radiusFilter, centers, searchQuery])
+
   // Update map markers
   const updateMapMarkers = useCallback(() => {
     if (!mapInstanceRef.current || !maps) return
@@ -431,6 +457,14 @@ export function LocationMap() {
       fetchCenters()
     }
   }, [userLocation, mapsLoaded])
+
+  // Re-fetch centers when filters that affect backend queries change
+  useEffect(() => {
+    if (userLocation && mapsLoaded) {
+      console.log('?? Re-fetching centers due to filter change', { radiusFilter, bloodFilter, useGooglePlaces })
+      fetchCenters()
+    }
+  }, [radiusFilter, bloodFilter, useGooglePlaces])
 
   // Update map markers when centers or filteredCenters change
   useEffect(() => {
