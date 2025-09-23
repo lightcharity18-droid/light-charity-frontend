@@ -45,19 +45,34 @@ export function LocationMap() {
 
   // Initialize map
   const initializeMap = useCallback(() => {
-    if (!mapsLoaded || !maps || !mapRef.current || mapInstanceRef.current) return
+    if (!mapsLoaded || !maps || !mapRef.current || mapInstanceRef.current) {
+      console.log('⏳ Map initialization skipped - waiting for requirements:', {
+        mapsLoaded,
+        mapsAvailable: !!maps,
+        mapRefAvailable: !!mapRef.current,
+        mapAlreadyExists: !!mapInstanceRef.current
+      })
+      return
+    }
 
     const defaultCenter = userLocation || { lat: 40.7128, lng: -74.0060 } // Default to NYC
-    
+    const initialZoom = userLocation ? 12 : 10
+
+    console.log('🗺️ Initializing Google Map with center:', defaultCenter, 'zoom:', initialZoom)
+
     mapInstanceRef.current = new maps.Map(mapRef.current, {
       center: defaultCenter,
-      zoom: userLocation ? 12 : 10,
+      zoom: initialZoom,
       styles: [
         {
           featureType: "poi.business",
           stylers: [{ visibility: "off" }]
         }
-      ]
+      ],
+      mapTypeControl: true,
+      fullscreenControl: true,
+      streetViewControl: true,
+      zoomControl: true
     })
 
     // Initialize directions renderer
@@ -69,35 +84,45 @@ export function LocationMap() {
       }
     })
     directionsRendererRef.current.setMap(mapInstanceRef.current)
+
+    console.log('✅ Google Map initialized successfully')
   }, [mapsLoaded, maps, userLocation])
 
   // Get user location
   const getUserLocation = useCallback(() => {
     if (!navigator.geolocation) {
+      console.warn('❌ Geolocation not supported')
       toast({
         title: "Geolocation not supported",
-        description: "Your browser doesn't support geolocation.",
+        description: "Your browser doesn't support geolocation. Using default location.",
         variant: "destructive",
       })
+      // Set default location (NYC)
+      const defaultLocation = { lat: 40.7128, lng: -74.0060 }
+      console.log('📍 Using default location (NYC):', defaultLocation)
+      setUserLocation(defaultLocation)
       return
     }
 
+    console.log('📍 Requesting user location...')
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         }
-        console.log('📍 User location obtained:', location)
+        console.log('✅ User location obtained:', location)
         setUserLocation(location)
-        
+
+        // Update map center and zoom if map is already initialized
         if (mapInstanceRef.current) {
+          console.log('🗺️ Updating map center to user location')
           mapInstanceRef.current.setCenter(location)
           mapInstanceRef.current.setZoom(12)
         }
       },
       (error) => {
-        console.error("Error getting location:", error)
+        console.error("❌ Error getting location:", error.message || error)
         toast({
           title: "Location access denied",
           description: "Unable to get your location. Using default location.",
@@ -108,7 +133,11 @@ export function LocationMap() {
         console.log('📍 Using default location (NYC):', defaultLocation)
         setUserLocation(defaultLocation)
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+      {
+        enableHighAccuracy: true,
+        timeout: 15000, // Increased timeout
+        maximumAge: 600000 // 10 minutes cache
+      }
     )
   }, [toast])
 
@@ -264,21 +293,39 @@ export function LocationMap() {
     console.log(`🎯 Added ${filteredCenters.length} center markers`)
 
     // Fit map to show all markers
-    if (filteredCenters.length > 0) {
+    if (filteredCenters.length > 0 && !userLocation) {
       const bounds = new maps.LatLngBounds()
-      
+
       if (userLocation) {
         bounds.extend(userLocation)
       }
-      
+
       filteredCenters.forEach(center => {
         bounds.extend({ lat: center.location.coordinates[1], lng: center.location.coordinates[0] })
       })
-      
+
       mapInstanceRef.current.fitBounds(bounds)
+
+      // Add padding to the bounds
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.fitBounds(bounds, {
+            top: 50,
+            right: 50,
+            bottom: 50,
+            left: 50
+          })
+        }
+      }, 100)
+
       console.log('🗺️ Map bounds adjusted to show all markers')
+    } else if (userLocation) {
+      // If no centers but we have user location, center on user
+      mapInstanceRef.current.setCenter(userLocation)
+      mapInstanceRef.current.setZoom(12)
+      console.log('🗺️ No centers found, centered on user location')
     }
-  }, [maps, userLocation, filteredCenters])
+  }, [maps, userLocation, filteredCenters, radiusFilter])
 
   // Calculate route to center
   const calculateRoute = useCallback(async (center: CombinedCenter) => {
@@ -340,7 +387,7 @@ export function LocationMap() {
     window.open(url, "_blank")
   }, [userLocation, toast])
 
-  // Initialize everything
+  // Initialize everything on component mount
   useEffect(() => {
     if (loadError) {
       console.error('❌ Google Maps load error:', loadError)
@@ -352,22 +399,46 @@ export function LocationMap() {
       return
     }
 
+    console.log('🚀 Initializing location map component...')
     getUserLocation()
-  }, [getUserLocation, loadError, toast])
 
-  useEffect(() => {
-    initializeMap()
-  }, [initializeMap])
+    // Fallback: If no location is set after 5 seconds, use default
+    const fallbackTimer = setTimeout(() => {
+      setUserLocation(prev => {
+        if (!prev) {
+          console.log('⏰ Location timeout - using default location')
+          return { lat: 40.7128, lng: -74.0060 } // NYC
+        }
+        return prev
+      })
+    }, 5000)
 
+    return () => clearTimeout(fallbackTimer)
+  }, [loadError, toast])
+
+  // Initialize map when Google Maps is loaded and user location is available (or after timeout)
   useEffect(() => {
-    if (userLocation) {
+    if (mapsLoaded) {
+      console.log('🗺️ Google Maps loaded, initializing map...')
+      initializeMap()
+    }
+  }, [mapsLoaded, userLocation])
+
+  // Fetch centers when user location is available
+  useEffect(() => {
+    if (userLocation && mapsLoaded) {
+      console.log('📍 User location available, fetching centers...')
       fetchCenters()
     }
-  }, [fetchCenters])
+  }, [userLocation, mapsLoaded])
 
+  // Update map markers when centers or filteredCenters change
   useEffect(() => {
-    updateMapMarkers()
-  }, [updateMapMarkers])
+    if (mapsLoaded && mapInstanceRef.current && filteredCenters.length >= 0) {
+      console.log('🎯 Updating map markers...')
+      updateMapMarkers()
+    }
+  }, [mapsLoaded, filteredCenters])
 
   if (loadError) {
     return (
@@ -471,8 +542,12 @@ export function LocationMap() {
         </div>
 
         <div className="relative w-full h-[500px] bg-gray-100 rounded-md overflow-hidden">
-          {!mapsLoaded || isLoading ? (
-            <div className="absolute inset-0 flex items-center justify-center">
+          {/* Always render the map container so initialization can occur immediately */}
+          <div ref={mapRef} className="w-full h-full" />
+
+          {/* Loading overlay sits on top of the map when needed */}
+          {(!mapsLoaded || isLoading) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
               <div className="text-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
                 <p className="text-muted-foreground">
@@ -480,8 +555,6 @@ export function LocationMap() {
                 </p>
               </div>
             </div>
-          ) : (
-            <div ref={mapRef} className="w-full h-full" />
           )}
         </div>
 

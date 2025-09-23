@@ -104,21 +104,27 @@ class GooglePlacesService {
     const searches = [
       // Strategy 1: Hospital + blood donation keyword
       this.nearbySearch(latitude, longitude, radius, 'hospital', 'blood donation'),
-      
+
       // Strategy 2: Hospital + blood bank keyword
       this.nearbySearch(latitude, longitude, radius, 'hospital', 'blood bank'),
-      
+
       // Strategy 3: Health + blood donation keyword
       this.nearbySearch(latitude, longitude, radius, 'health', 'blood donation'),
-      
+
       // Strategy 4: Text search for blood donation
       this.textSearch(`blood donation center near ${latitude},${longitude}`),
-      
+
       // Strategy 5: Text search for blood bank
       this.textSearch(`blood bank near ${latitude},${longitude}`),
-      
-      // Strategy 6: Text search for NGO
-      this.textSearch(`NGO blood donation near ${latitude},${longitude}`)
+
+      // Strategy 6: Text search for Red Cross
+      this.textSearch(`Red Cross blood donation near ${latitude},${longitude}`),
+
+      // Strategy 7: Text search for American Red Cross
+      this.textSearch(`American Red Cross near ${latitude},${longitude}`),
+
+      // Strategy 8: Text search for hospital blood center
+      this.textSearch(`hospital blood center near ${latitude},${longitude}`)
     ]
 
     try {
@@ -219,57 +225,61 @@ class GooglePlacesService {
 
   // Convert Google Place to our DonationCenter format
   private async convertToDonationCenter(place: GooglePlace): Promise<DonationCenterFromPlaces> {
+    let details: any = null
+
     try {
-      // Get detailed information
-      const details = await this.getPlaceDetails(place.place_id)
-      
-      // Parse address
-      const addressParts = (details.formatted_address || place.vicinity || '').split(', ')
-      const fullAddress = details.formatted_address || place.vicinity || ''
-      
-      // Parse operating hours
-      const operatingHours = this.parseOperatingHours(details.opening_hours)
-      
-      return {
-        id: place.place_id,
-        placeId: place.place_id,
-        name: place.name,
-        address: {
-          street: addressParts[0] || '',
-          city: addressParts[1] || '',
-          state: addressParts[2] || '',
-          zipCode: addressParts[3] || '',
-          country: addressParts[4] || 'USA',
-          fullAddress: fullAddress
-        },
-        location: {
-          type: 'Point',
-          coordinates: [place.geometry.location.lng, place.geometry.location.lat]
-        },
-        contact: {
-          phone: details.formatted_phone_number,
-          website: details.website
-        },
-        operatingHours: operatingHours,
-        bloodTypesAccepted: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], // Default assumption
-        bloodInventory: [], // Would need separate API or data source
-        services: ['blood_donation'], // Default assumption
-        capacity: {
-          dailyDonors: 50, // Default assumption
-          appointmentSlots: 20 // Default assumption
-        },
-        status: details.business_status === 'OPERATIONAL' ? 'active' : 'inactive',
-        rating: {
-          average: place.rating || 0,
-          count: place.user_ratings_total || 0
-        },
-        features: this.inferFeatures(place.types),
-        businessStatus: details.business_status || 'UNKNOWN'
-      }
+      // Try to get detailed information
+      details = await this.getPlaceDetails(place.place_id)
+      console.log(`✅ Got details for ${place.name}`)
     } catch (error) {
-      console.error(`Error getting details for ${place.name}:`, error)
-      // Return basic info if details fail
-      return this.createBasicDonationCenter(place)
+      console.warn(`⚠️ Failed to get details for ${place.name} (${place.place_id}):`, error.message || error)
+      // Continue with basic info if details fail
+    }
+
+    // Use details if available, otherwise fall back to basic place info
+    const addressSource = details?.formatted_address || place.formatted_address || place.vicinity || ''
+    const addressParts = addressSource.split(', ')
+
+    // Parse operating hours
+    const operatingHours = details?.opening_hours ?
+      this.parseOperatingHours(details.opening_hours) :
+      this.getDefaultOperatingHours()
+
+    return {
+      id: place.place_id,
+      placeId: place.place_id,
+      name: place.name,
+      address: {
+        street: addressParts[0] || '',
+        city: addressParts[1] || '',
+        state: addressParts[2] || '',
+        zipCode: addressParts[3] || '',
+        country: addressParts[4] || 'USA',
+        fullAddress: addressSource
+      },
+      location: {
+        type: 'Point',
+        coordinates: [place.geometry.location.lng, place.geometry.location.lat]
+      },
+      contact: {
+        phone: details?.formatted_phone_number,
+        website: details?.website
+      },
+      operatingHours: operatingHours,
+      bloodTypesAccepted: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], // Default assumption
+      bloodInventory: [], // Would need separate API or data source
+      services: ['blood_donation'], // Default assumption
+      capacity: {
+        dailyDonors: 50, // Default assumption
+        appointmentSlots: 20 // Default assumption
+      },
+      status: (details?.business_status === 'OPERATIONAL' || place.business_status === 'OPERATIONAL') ? 'active' : 'inactive',
+      rating: {
+        average: place.rating || 0,
+        count: place.user_ratings_total || 0
+      },
+      features: this.inferFeatures(place.types),
+      businessStatus: details?.business_status || place.business_status || 'OPERATIONAL'
     }
   }
 
@@ -312,17 +322,25 @@ class GooglePlacesService {
     }
   }
 
+  // Get default operating hours when no hours are available
+  private getDefaultOperatingHours(): { [key: string]: { open: string; close: string; closed: boolean } } {
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    const hours: { [key: string]: { open: string; close: string; closed: boolean } } = {}
+
+    days.forEach(day => {
+      hours[day] = { open: '', close: '', closed: true }
+    })
+
+    return hours
+  }
+
   // Parse Google's opening hours format
   private parseOperatingHours(openingHours?: any): { [key: string]: { open: string; close: string; closed: boolean } } {
     const hours: { [key: string]: { open: string; close: string; closed: boolean } } = {}
     
     if (!openingHours || !openingHours.weekday_text) {
-      // Default to closed if no hours available
-      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-      days.forEach(day => {
-        hours[day] = { open: '', close: '', closed: true }
-      })
-      return hours
+      // Return default hours if no hours available
+      return this.getDefaultOperatingHours()
     }
 
     const dayMap: { [key: string]: string } = {
@@ -391,29 +409,33 @@ class GooglePlacesService {
   private isLikelyDonationCenter(center: DonationCenterFromPlaces): boolean {
     const name = center.name.toLowerCase()
     const address = center.address.fullAddress.toLowerCase()
-    
+
     // Keywords that suggest it's a donation center
     const donationKeywords = [
       'blood', 'donation', 'donor', 'transfusion', 'hematology',
-      'red cross', 'blood bank', 'plasma', 'platelet'
+      'red cross', 'blood bank', 'plasma', 'platelet', 'center',
+      'medical center', 'hospital', 'health', 'community'
     ]
-    
+
     // Check if name or address contains donation-related keywords
-    const hasDonationKeyword = donationKeywords.some(keyword => 
+    const hasDonationKeyword = donationKeywords.some(keyword =>
       name.includes(keyword) || address.includes(keyword)
     )
-    
+
     // Exclude places that are clearly not donation centers
     const excludeKeywords = [
-      'restaurant', 'hotel', 'gas station', 'pharmacy', 'clinic',
-      'dental', 'veterinary', 'animal', 'pet'
+      'restaurant', 'hotel', 'gas station', 'pharmacy without blood',
+      'dental', 'veterinary', 'animal', 'pet', 'store', 'shop',
+      'mall', 'parking', 'atm'
     ]
-    
-    const hasExcludeKeyword = excludeKeywords.some(keyword => 
+
+    const hasExcludeKeyword = excludeKeywords.some(keyword =>
       name.includes(keyword) || address.includes(keyword)
     )
-    
-    return hasDonationKeyword && !hasExcludeKeyword
+
+    // Be more lenient - if we found it through our searches, it's likely relevant
+    // Only exclude if it clearly has exclude keywords, and require some relevance
+    return !hasExcludeKeyword && hasDonationKeyword
   }
 }
 
